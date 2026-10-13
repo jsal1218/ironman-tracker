@@ -1,11 +1,14 @@
 (()=>{'use strict';
 // APP_VERSION is stamped automatically by the git pre-commit hook. Do not edit by hand.
-const APP_VERSION='2026.10.13-201720-429dfd7';
+const APP_VERSION='2026.10.13-202620-5ef760e';
 const KEY='fitness-tracker-entries-v1',SKEY='im-tracker-settings-v1',TYPES=['swim','bike','run','brick','strength','other'],MAIN=['swim','bike','run'];
-const DIST={sprint:{n:'Sprint',swim:.75,bike:20,run:5,w:12,t:{swim:1.5,bike:2.5,run:2,brick:.5,strength:1,other:0}},olympic:{n:'Olympic',swim:1.5,bike:40,run:10,w:16,t:{swim:2,bike:4,run:3,brick:.5,strength:1,other:0}},half:{n:'Half (113 km)',swim:1.9,bike:90,run:21.1,w:20,t:{swim:2.5,bike:5.5,run:3.5,brick:1,strength:1,other:0}},full:{n:'Full (226 km)',swim:3.8,bike:180,run:42.2,w:30,t:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}}},KM_MI=1.609344,M_YD=.9144,DAY=864e5;
+const MI=1.609344,DIST={sprint:{n:'Sprint (16 mi)',swim:.47*MI,bike:12.4*MI,run:3.1*MI,w:12,t:{swim:1.5,bike:2.5,run:2,brick:.5,strength:1,other:0}},olympic:{n:'Olympic (32 mi)',swim:.93*MI,bike:24.8*MI,run:6.2*MI,w:16,t:{swim:2,bike:4,run:3,brick:.5,strength:1,other:0}},half:{n:'Half (70.3 mi)',swim:1.2*MI,bike:56*MI,run:13.1*MI,w:20,t:{swim:2.5,bike:5.5,run:3.5,brick:1,strength:1,other:0}},full:{n:'Full (140.6 mi)',swim:2.4*MI,bike:112*MI,run:26.2*MI,w:30,t:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}}},KM_MI=1.609344,M_YD=.9144,DAY=864e5;
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 const col=t=>`var(--${t})`,D0=()=>DIST[S.raceDist]||DIST.full;
-let entries=load(KEY,[]),S=Object.assign({raceDist:'full',units:'metric',swimUnit:'m',raceName:'',raceDate:'',planStart:'',planWeeks:30,targets:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}},load(SKEY,{}));
+let entries=load(KEY,[]),S=Object.assign({raceDist:'full',units:'imperial',swimUnit:'yd',weekStart:1,raceName:'',raceDate:'',planStart:'',planWeeks:30,targets:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}},load(SKEY,{}));
+const hadS=localStorage.getItem(SKEY)!==null;
+// one-time migration to US customary defaults (metric remains selectable)
+if(S.unitsV!==2){S.units='imperial';S.swimUnit='yd';S.weekStart??=1;S.unitsV=2;localStorage.setItem(SKEY,JSON.stringify(S))}
 let period='week',shown=50,dirty=true;
 function load(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
 // migrate v1 entries
@@ -16,7 +19,8 @@ const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice
 const parse=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r1=n=>Math.round(n*10)/10,today=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
-const monday=x=>{const s=new Date(x);s.setHours(0,0,0,0);s.setDate(s.getDate()-((s.getDay()+6)%7));return s};
+const monday=x=>{const s=new Date(x);s.setHours(0,0,0,0);s.setDate(s.getDate()-((s.getDay()-(+S.weekStart||0)+7)%7));return s};
+const fmtD=d=>(typeof d==='string'?parse(d):d).toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'}),fmtS=d=>(typeof d==='string'?parse(d):d).toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
 const hm=min=>{min=Math.round(min);const h=Math.floor(min/60),m=min%60;return h?`${h}h${m?` ${m}m`:''}`:`${m}m`};
 const mmss=sec=>{sec=Math.round(sec);return`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`};
 const isSwim=t=>t==='swim',runLike=t=>t==='run'||t==='brick';
@@ -24,6 +28,7 @@ const isSwim=t=>t==='swim',runLike=t=>t==='run'||t==='brick';
 const unit=t=>isSwim(t)?S.swimUnit:S.units==='imperial'?'mi':'km';
 const fromKm=(t,km)=>isSwim(t)?km*1000/(S.swimUnit==='yd'?M_YD:1):S.units==='imperial'?km/KM_MI:km;
 const toKm=(t,v)=>isSwim(t)?v*(S.swimUnit==='yd'?M_YD:1)/1000:S.units==='imperial'?v*KM_MI:v;
+const raceStr=t=>{const k=D0()[t];return isSwim(t)&&S.units==='imperial'?`${r1(k/MI)} mi (${Math.round(fromKm(t,k)).toLocaleString()} ${unit(t)})`:distStr(t,k)};
 const distStr=(t,km)=>{const v=fromKm(t,km);return isSwim(t)?`${Math.round(v).toLocaleString()} ${unit(t)}`:`${r1(v)} ${unit(t)}`};
 function pace(e){if(!e.distance||!e.duration)return'';const v=fromKm(e.type,e.distance),u=unit(e.type);
  if(isSwim(e.type))return`${mmss(e.duration*60/(v/100))} /100${u}`;
@@ -56,7 +61,7 @@ function renderList(){if(dirty){sorted=[...entries].sort((a,b)=>b.date.localeCom
  const f=$('#filter').value,l=f?sorted.filter(e=>e.type===f):sorted;
  $('#entries').innerHTML=l.length?l.slice(0,shown).map(e=>{const bits=[hm(e.duration)];if(e.distance)bits.push(distStr(e.type,e.distance));const p=pace(e);if(p)bits.push(p);
   const sub=[e.hr?`♥ ${e.hr}`:'',e.rpe?`RPE ${e.rpe}`:'',e.calories?`${e.calories} kcal`:'',esc(e.notes)].filter(Boolean).join(' · ');
-  return`<div class="entry"><span class="badge" style="background:${col(e.type)}">${e.type}</span><div class="info"><div><b>${bits.join(' · ')}</b> <span class="muted">${e.date}</span></div><div class="sub">${sub}</div></div><button data-edit="${e.id}" aria-label="Edit ${e.type} on ${e.date}">✎</button><button class="danger" data-del="${e.id}" aria-label="Delete ${e.type} on ${e.date}">✕</button></div>`}).join(''):'<div class="empty"><span class="ico">🏁</span><b>No sessions yet</b><br>Pick a discipline above and log your first workout.<br><button type="button" data-goto="settings">Or try sample data</button></div>';
+  return`<div class="entry"><span class="badge" style="background:${col(e.type)}">${e.type}</span><div class="info"><div><b>${bits.join(' · ')}</b> <span class="muted">${fmtS(e.date)}</span></div><div class="sub">${sub}</div></div><button data-edit="${e.id}" aria-label="Edit ${e.type} on ${fmtS(e.date)}">✎</button><button class="danger" data-del="${e.id}" aria-label="Delete ${e.type} on ${fmtS(e.date)}">✕</button></div>`}).join(''):'<div class="empty"><span class="ico">🏁</span><b>No sessions yet</b><br>Pick a discipline above and log your first workout.<br><button type="button" data-goto="settings">Or try sample data</button></div>';
  $('#moreBtn').hidden=l.length<=shown;$('#moreBtn').textContent=`Show more (${l.length-shown} older)`}
 $('#entries').addEventListener('click',e=>{const ed=e.target.closest('[data-edit]'),de=e.target.closest('[data-del]');
  if(ed){const o=entries.find(x=>x.id===ed.dataset.edit);fill(o,true);$('#eid').value=o.id;$('#saveBtn').textContent='Save changes';$('#formTitle').textContent='Edit session';$('#cancelEdit').hidden=false;scrollTo({top:0,behavior:'smooth'});$('#duration').focus({preventScroll:true})}
@@ -83,21 +88,21 @@ function renderRace(){const p=plan(),el=$('#race');
  if(!p){el.innerHTML=`<div><h2>Training plan</h2><p class="muted">Log your first session (or set a plan start in Settings) to start a ${S.planWeeks||D0().w}-week plan. Race date is optional.</p></div>`;return}
  const wkTxt=p.wk<1?`Starts in ${1-p.wk} wk`:p.wk>p.weeks?'Plan complete':`Week ${p.wk} of ${p.weeks}`,moTxt=p.wk<1?'':`Month ${Math.max(1,p.mo)} of ${p.months}`;
  const pct=Math.min(100,Math.max(0,(p.wk-1)/p.weeks*100));
- el.innerHTML=`<div style="flex:1;min-width:220px"><h2>${esc(S.raceName)||(S.raceDate?'Race':`${D0().n} triathlon plan`)}</h2><div class="muted">${S.raceDate?`Race day ${parse(S.raceDate).toLocaleDateString(undefined,{dateStyle:'medium'})}`:`No race date set — ${p.weeks}-week plan from ${p.start.toLocaleDateString()}`} · Phase: <b>${phase(p.wk,p.weeks)}</b></div>
+ el.innerHTML=`<div style="flex:1;min-width:220px"><h2>${esc(S.raceName)||(S.raceDate?'Race':`${D0().n} triathlon plan`)}</h2><div class="muted">${S.raceDate?`Race day ${fmtS(S.raceDate)+', '+parse(S.raceDate).getFullYear()}`:`No race date set — ${p.weeks}-week plan from ${fmtD(p.start)}`} · Phase: <b>${phase(p.wk,p.weeks)}</b></div>
  <div class="track" style="margin-top:10px" role="progressbar" aria-label="Plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><div style="width:${pct}%;background:linear-gradient(90deg,var(--acc),var(--hi))"></div></div></div>
  <div class="big"><div><b>${wkTxt.replace(/^Week /,'')}</b><span class="muted">${p.wk>=1&&p.wk<=p.weeks?'Training week':wkTxt}</span></div>${moTxt?`<div><b>${moTxt.replace(/^Month /,'')}</b><span class="muted">Month</span></div>`:''}<div><b>${Math.max(0,p.days)}</b><span class="muted">Days ${S.raceDate?'to race':'left in plan'} · ${Math.max(0,Math.ceil(p.days/7))} wk</span></div></div>`}
 function chg(c,p){if(!p&&!c)return'<span class="muted">—</span>';if(!p)return'<span style="color:var(--ok)">new</span>';const d=Math.round((c-p)/p*100);return`<span style="color:${d>=0?'var(--ok)':'var(--danger)'}">${d>=0?'▲':'▼'} ${Math.abs(d)}%</span>`}
 function renderProgress(){if(dirty)renderList();renderRace();
  const t=today(),start=startOf(t,period),end=shift(start,period,1),prevS=shift(start,period,-1),cur=agg(inR(start,end)),ptd=Math.min(end-start,t-start+DAY),prev=agg(inR(prevS,new Date(prevS.getTime()+ptd)));
  const pname={week:'week',month:'month',year:'year'}[period];
- $('#rangeLbl').textContent=`This ${pname}: ${start.toLocaleDateString()} – ${new Date(end-DAY).toLocaleDateString()}`;
+ $('#rangeLbl').textContent=`This ${pname}: ${fmtD(start)} – ${fmtD(new Date(end-DAY))}`;
  const dist=t=>{const k=cur.by[t].km;return k?distStr(t,k):'—'};
  $('#stats').innerHTML=[['Sessions',cur.sessions,chg(cur.sessions,prev.sessions)],['Time',hm(cur.minutes),chg(cur.minutes,prev.minutes)],['Swim',dist('swim'),chg(cur.by.swim.km,prev.by.swim.km)],['Bike',dist('bike'),chg(cur.by.bike.km,prev.by.bike.km)],['Run',dist('run'),chg(cur.by.run.km+cur.by.brick.km,prev.by.run.km+prev.by.brick.km)]]
   .map(([k,v,c])=>`<div class="stat"><b>${v}</b><span>${k} · ${c}</span></div>`).join('');
  // stacked chart
  const n=period==='year'?5:12,m=$('#metric').value,buckets=[];for(let i=n-1;i>=0;i--){const s=shift(start,period,-i);buckets.push({s,a:agg(inR(s,shift(s,period,1)))})}
  const val=(a,ty)=>m==='hours'?a.by[ty].minutes/60:a.by[ty][m];const tot=buckets.map(b=>TYPES.reduce((x,ty)=>x+val(b.a,ty),0)),max=Math.max(1,...tot),W=600,H=225,P=32,bw=(W-P)/n;
- const lab=s=>period==='week'?`${s.getMonth()+1}/${s.getDate()}`:period==='month'?s.toLocaleString(undefined,{month:'short'}):s.getFullYear();
+ const lab=s=>period==='week'?`${s.getMonth()+1}/${s.getDate()}`:period==='month'?s.toLocaleString('en-US',{month:'short'}):s.getFullYear();
  $('#chart').innerHTML=`<svg viewBox="0 0 ${W} 250" role="img" aria-label="${m} per ${pname} by discipline">${[0,.5,1].map(f=>`<line x1="${P}" x2="${W}" y1="${H-f*(H-15)}" y2="${H-f*(H-15)}" stroke="var(--line)"/><text x="0" y="${H-f*(H-15)+4}">${r1(max*f)}</text>`).join('')}${buckets.map((b,i)=>{let y=H;return TYPES.map(ty=>{const h=val(b.a,ty)/max*(H-15);if(!h)return'';y-=h;return`<rect x="${P+i*bw+bw*.15}" y="${y}" width="${bw*.7}" height="${h}" fill="${col(ty)}"><title>${lab(b.s)} ${ty}: ${r1(val(b.a,ty))}</title></rect>`}).join('')+`<text x="${P+i*bw+bw/2}" y="${H+17}" text-anchor="middle">${lab(b.s)}</text>`}).join('')}</svg>`;
  $('#legend').innerHTML=TYPES.map(ty=>`<span><i style="background:${col(ty)}"></i>${ty}</span>`).join('');
  // breakdown with change
@@ -110,15 +115,15 @@ function renderProgress(){if(dirty)renderList();renderRace();
  // long sessions
  $('#longs').innerHTML=MAIN.map(ty=>{const l=entries.filter(e=>(e.type===ty||(ty==='run'&&e.type==='brick'))&&e.distance);const best=l.reduce((a,e)=>!a||e.distance>a.distance?e:a,null),
   r28=l.filter(e=>parse(e.date)>=new Date(t-28*DAY)).reduce((a,e)=>Math.max(a,e.distance),0),p=best?Math.min(100,best.distance/D0()[ty]*100):0;
-  return`<div class="brow"><span>${ty}</span><div class="track" role="progressbar" aria-label="Longest ${ty} as percent of race distance" aria-valuenow="${Math.round(p)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p}%;background:${col(ty)}"></div></div><span class="muted">${best?distStr(ty,best.distance):'—'} / ${distStr(ty,D0()[ty])}</span></div><div class="muted" style="margin:-6px 0 6px 84px">${best?`${Math.round(p)}% · best ${best.date} · last 4 wk ${r28?distStr(ty,r28):'—'}`:'No sessions with distance'}</div>`}).join('');
+  return`<div class="brow"><span>${ty}</span><div class="track" role="progressbar" aria-label="Longest ${ty} as percent of race distance" aria-valuenow="${Math.round(p)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p}%;background:${col(ty)}"></div></div><span class="muted">${best?distStr(ty,best.distance):'—'} / ${raceStr(ty)}</span></div><div class="muted" style="margin:-6px 0 6px 84px">${best?`${Math.round(p)}% · best ${fmtS(best.date)} · last 4 wk ${r28?distStr(ty,r28):'—'}`:'No sessions with distance'}</div>`}).join('');
  // streaks
  const days=new Set(entries.map(e=>e.date)),d=new Date();let cs=0;if(!days.has(iso(d)))d.setDate(d.getDate()-1);while(days.has(iso(d))){cs++;d.setDate(d.getDate()-1)}
  let best=0,run=0,pv=null;[...days].sort().forEach(s=>{const x=parse(s);run=pv&&(x-pv)/DAY<1.5?run+1:1;best=Math.max(best,run);pv=x});
  const wks=new Set([...days].map(s=>iso(monday(parse(s)))));let ws=0,wd=monday(t);if(!wks.has(iso(wd)))wd.setDate(wd.getDate()-7);while(wks.has(iso(wd))){ws++;wd.setDate(wd.getDate()-7)}
  $('#streaks').innerHTML=`<div class="big"><div><b>${cs}</b><span class="muted">Day streak</span></div><div><b>${best}</b><span class="muted">Longest day streak</span></div><div><b>${ws}</b><span class="muted">Active-week streak</span></div></div>`}
 // ---------- settings ----------
-function fillSettings(){['raceName','raceDist','raceDate','planStart','planWeeks','units','swimUnit'].forEach(k=>$('#'+k).value=S[k]??'');TYPES.forEach(t=>$('#tg-'+t).value=S.targets[t]??0)}
-$('#setForm').onsubmit=e=>{e.preventDefault();['raceName','raceDist','raceDate','planStart','units','swimUnit'].forEach(k=>S[k]=$('#'+k).value);S.planWeeks=+$('#planWeeks').value||D0().w;TYPES.forEach(t=>S.targets[t]=+$('#tg-'+t).value||0);saveS();setUnitLbl();flash('#setStatus','Saved ✓')};
+function fillSettings(){['raceName','raceDist','raceDate','planStart','planWeeks','units','swimUnit','weekStart'].forEach(k=>$('#'+k).value=S[k]??'');TYPES.forEach(t=>$('#tg-'+t).value=S.targets[t]??0)}
+$('#setForm').onsubmit=e=>{e.preventDefault();['raceName','raceDist','raceDate','planStart','units','swimUnit'].forEach(k=>S[k]=$('#'+k).value);S.weekStart=+$('#weekStart').value;S.planWeeks=+$('#planWeeks').value||D0().w;TYPES.forEach(t=>S.targets[t]=+$('#tg-'+t).value||0);saveS();setUnitLbl();flash('#setStatus','Saved ✓')};
 $('#exportBtn').onclick=()=>{const b=new Blob([JSON.stringify({app:'dashfit',version:2,exported:new Date().toISOString(),settings:S,entries},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`dashfit-backup-${iso(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $('#importBtn').onclick=()=>$('#importFile').click();
 $('#importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text()),l=Array.isArray(j)?j:j.entries;if(!Array.isArray(l))throw 0;
@@ -158,7 +163,7 @@ $('#theme').value=localStorage.getItem('dashfit-theme')||'light';applyTheme($('#
 $('#theme').onchange=e=>{localStorage.setItem('dashfit-theme',e.target.value);applyTheme(e.target.value)};
 function render(){renderList();if($('#view-progress').classList.contains('active'))renderProgress()}
 fillSettings();setUnitLbl();render();
-if(!S.onboarded){if(entries.length||localStorage.getItem(SKEY)){S.onboarded=true;localStorage.setItem(SKEY,JSON.stringify(S))}else openOnboard()}
+if(!S.onboarded){if(entries.length||hadS){S.onboarded=true;localStorage.setItem(SKEY,JSON.stringify(S))}else openOnboard()}
 $('#appVersion').textContent=APP_VERSION;
 // ---------- fast auto-update ----------
 if('serviceWorker'in navigator&&location.protocol.startsWith('http')){const sw=navigator.serviceWorker,hadCtrl=!!sw.controller;let reloading=false;

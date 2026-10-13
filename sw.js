@@ -1,5 +1,5 @@
 // VERSION is stamped automatically by the git pre-commit hook (scripts/stamp-version.sh). Do not edit by hand.
-const VERSION='2026.10.13-201720-429dfd7';
+const VERSION='2026.10.13-202620-5ef760e';
 const C='dashfit-'+VERSION,CORE=['./','./index.html','./app.js','./manifest.json'],STATIC=['./icons/icon-192.png','./icons/icon-512.png','./icons/favicon-32.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll([...CORE,...STATIC].map(u=>new Request(u,{cache:'reload'})))))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));

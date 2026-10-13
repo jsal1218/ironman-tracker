@@ -73,7 +73,7 @@ dialog{border:1px solid var(--line);border-radius:20px;background:var(--card);co
    <label>RPE (1–10)<select id="rpe"><option value="">—</option>
    </select></label>
    <label>Calories<input type="number" id="calories" min="0" inputmode="numeric" placeholder="optional"></label>
-   <label class="wide">Notes<input id="notes" maxlength="300" placeholder="e.g. Z2 long ride, 4×1 km threshold"></label></div></details>
+   <label class="wide">Notes<input id="notes" maxlength="300" placeholder="e.g. Z2 long ride, 4×1 mi threshold"></label></div></details>
   <input type="hidden" id="eid">
   <div class="row"><button type="submit" class="primary" id="saveBtn">Add session</button><button type="button" id="cancelEdit" hidden>Cancel edit</button><span id="status" class="muted" role="status" aria-live="polite"></span></div>
  </form>
@@ -96,8 +96,8 @@ dialog{border:1px solid var(--line);border-radius:20px;background:var(--card);co
  <form class="card" id="setForm"><h2>Race &amp; plan</h2><div class="grid">
   <label>Race name<input id="raceName" placeholder="e.g. Lakeside Triathlon"></label><label>Race distance<select id="raceDist"></select></label><label>Race date (optional)<input type="date" id="raceDate"></label><label>Plan start (blank = first session)<input type="date" id="planStart"></label><label>Plan length (weeks, if no race date)<input type="number" id="planWeeks" min="4" max="104" inputmode="numeric" placeholder="30"></label></div>
   <h2 style="margin-top:18px">Units</h2><div class="grid">
-  <label>Bike / run<select id="units"><option value="metric">Kilometres (km, km/h, /km)</option><option value="imperial">Miles (mi, mph, /mi)</option></select></label>
-  <label>Appearance<select id="theme"><option value="light">Light (ivory)</option><option value="dark">Dark</option></select></label><label>Swim<select id="swimUnit"><option value="m">Metres (/100m)</option><option value="yd">Yards (/100yd)</option></select></label></div>
+  <label>Bike / run<select id="units"><option value="imperial">Miles (mi, mph, /mi)</option><option value="metric">Kilometers (km, km/h, /km)</option></select></label>
+  <label>Appearance<select id="theme"><option value="light">Light (ivory)</option><option value="dark">Dark</option></select></label><label>Swim<select id="swimUnit"><option value="yd">Yards (/100 yd)</option><option value="m">Meters (/100 m)</option></select></label><label>Week starts on<select id="weekStart"><option value="1">Monday (training week)</option><option value="0">Sunday</option></select></label></div>
   <h2 style="margin-top:18px">Weekly targets (hours)</h2><div class="grid" id="targetInputs"></div>
   <div class="row"><button class="primary">Save settings</button><span id="setStatus" class="muted" role="status" aria-live="polite"></span></div></form>
  <div class="card"><h2>Data</h2><p class="muted">Data is stored only in this browser (localStorage). Export a backup regularly.</p>
@@ -108,7 +108,7 @@ dialog{border:1px solid var(--line);border-radius:20px;background:var(--card);co
 </main>
 <dialog id="onboard" aria-labelledby="obTitle"><form method="dialog" id="obForm"><div class="ob-head"><h2 id="obTitle">Welcome to DashFit</h2><p>Set up your plan in 30 seconds. <b>Everything stays on this device.</b></p></div><div class="ob-body">
 <div class="grid"><label>Race distance<select id="obDist"></select></label><label>Race date (optional)<input type="date" id="obRace"></label><label>Plan start<input type="date" id="obStart"></label><label>Plan length (weeks)<input type="number" id="obWeeks" min="4" max="104" inputmode="numeric"></label>
-<label>Bike / run units<select id="obUnits"><option value="metric">km</option><option value="imperial">miles</option></select></label><label>Swim units<select id="obSwim"><option value="m">metres</option><option value="yd">yards</option></select></label></div>
+<label>Bike / run units<select id="obUnits"><option value="imperial">miles</option><option value="metric">km</option></select></label><label>Swim units<select id="obSwim"><option value="yd">yards</option><option value="m">meters</option></select></label></div>
 <h3>Weekly targets (hours) — suggested for your distance</h3><div class="grid" id="obTargets"></div>
 <div class="row between"><button type="button" id="obSample">Explore with sample data</button><button class="primary" id="obGo">Start training →</button></div></div></form></dialog>
 <footer>DashFit is an independent training tool and is not affiliated with, endorsed by, or sponsored by IRONMAN®, World Triathlon, or any race organizer. Data is stored locally in your browser. · Version <span id="appVersion">dev</span></footer>
