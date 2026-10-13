@@ -117,7 +117,7 @@ function renderProgress(){if(dirty)renderList();renderRace();
 // ---------- settings ----------
 function fillSettings(){['raceName','raceDist','raceDate','planStart','planWeeks','units','swimUnit'].forEach(k=>$('#'+k).value=S[k]??'');TYPES.forEach(t=>$('#tg-'+t).value=S.targets[t]??0)}
 $('#setForm').onsubmit=e=>{e.preventDefault();['raceName','raceDist','raceDate','planStart','units','swimUnit'].forEach(k=>S[k]=$('#'+k).value);S.planWeeks=+$('#planWeeks').value||D0().w;TYPES.forEach(t=>S.targets[t]=+$('#tg-'+t).value||0);saveS();setUnitLbl();flash('#setStatus','Saved ✓')};
-$('#exportBtn').onclick=()=>{const b=new Blob([JSON.stringify({app:'tripace',version:2,exported:new Date().toISOString(),settings:S,entries},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`tripace-backup-${iso(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('#exportBtn').onclick=()=>{const b=new Blob([JSON.stringify({app:'dashfit',version:2,exported:new Date().toISOString(),settings:S,entries},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`dashfit-backup-${iso(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $('#importBtn').onclick=()=>$('#importFile').click();
 $('#importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text()),l=Array.isArray(j)?j:j.entries;if(!Array.isArray(l))throw 0;
  const ok=l.filter(x=>x&&x.date&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&+x.duration>0).map(x=>({...x,id:String(x.id||Math.random()),type:TYPES.includes(x.type)?x.type:x.type==='cycle'?'bike':'other',duration:+x.duration}));
@@ -150,6 +150,10 @@ $('#obForm').onsubmit=()=>{obSave();flash('#status','Plan saved — log your fir
 $('#obSample').onclick=()=>{obSave();$('#onboard').close();document.querySelector('[data-view=settings]').click();$('#sampleBtn').click()};
 $('#onboard').addEventListener('cancel',()=>{S.onboarded=true;localStorage.setItem(SKEY,JSON.stringify(S))});
 $('#setupBtn').onclick=openOnboard;
+// ---------- theme ----------
+const applyTheme=v=>{document.documentElement.dataset.theme=v==='dark'?'dark':'light';$('#themeColor').content=v==='dark'?'#130b0c':'#f7f4ee'};
+$('#theme').value=localStorage.getItem('dashfit-theme')||'light';applyTheme($('#theme').value);
+$('#theme').onchange=e=>{localStorage.setItem('dashfit-theme',e.target.value);applyTheme(e.target.value)};
 function render(){renderList();if($('#view-progress').classList.contains('active'))renderProgress()}
 fillSettings();setUnitLbl();render();
 if(!S.onboarded){if(entries.length||localStorage.getItem(SKEY)){S.onboarded=true;localStorage.setItem(SKEY,JSON.stringify(S))}else openOnboard()}
