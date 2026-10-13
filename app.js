@@ -1,4 +1,6 @@
 (()=>{'use strict';
+// APP_VERSION is stamped automatically by the git pre-commit hook. Do not edit by hand.
+const APP_VERSION='2026.10.13-201624-463f5d0';
 const KEY='fitness-tracker-entries-v1',SKEY='im-tracker-settings-v1',TYPES=['swim','bike','run','brick','strength','other'],MAIN=['swim','bike','run'];
 const DIST={sprint:{n:'Sprint',swim:.75,bike:20,run:5,w:12,t:{swim:1.5,bike:2.5,run:2,brick:.5,strength:1,other:0}},olympic:{n:'Olympic',swim:1.5,bike:40,run:10,w:16,t:{swim:2,bike:4,run:3,brick:.5,strength:1,other:0}},half:{n:'Half (113 km)',swim:1.9,bike:90,run:21.1,w:20,t:{swim:2.5,bike:5.5,run:3.5,brick:1,strength:1,other:0}},full:{n:'Full (226 km)',swim:3.8,bike:180,run:42.2,w:30,t:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}}},KM_MI=1.609344,M_YD=.9144,DAY=864e5;
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
@@ -157,5 +159,12 @@ $('#theme').onchange=e=>{localStorage.setItem('dashfit-theme',e.target.value);ap
 function render(){renderList();if($('#view-progress').classList.contains('active'))renderProgress()}
 fillSettings();setUnitLbl();render();
 if(!S.onboarded){if(entries.length||localStorage.getItem(SKEY)){S.onboarded=true;localStorage.setItem(SKEY,JSON.stringify(S))}else openOnboard()}
-if('serviceWorker'in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+$('#appVersion').textContent=APP_VERSION;
+// ---------- fast auto-update ----------
+if('serviceWorker'in navigator&&location.protocol.startsWith('http')){const sw=navigator.serviceWorker,hadCtrl=!!sw.controller;let reloading=false;
+ const busy=()=>$('#onboard').open||!!$('#eid').value||['duration','distance','notes','hr','calories'].some(k=>$('#'+k).value!=='')||(document.activeElement&&/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName));
+ const reload=()=>{if(!reloading){reloading=true;location.reload()}};
+ sw.addEventListener('controllerchange',()=>{if(!hadCtrl||reloading)return;if(!busy())return reload();const t=$('#toast');t.hidden=false;t.onclick=reload});
+ addEventListener('load',()=>sw.register('sw.js',{updateViaCache:'none'}).then(reg=>{const up=()=>reg.update().catch(()=>{});up();
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')up()});setInterval(up,60000)}).catch(()=>{}))}
 })();
