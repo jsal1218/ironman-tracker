@@ -1,9 +1,9 @@
 (()=>{'use strict';
 const KEY='fitness-tracker-entries-v1',SKEY='im-tracker-settings-v1',TYPES=['swim','bike','run','brick','strength','other'],MAIN=['swim','bike','run'];
-const IM={swim:3.8,bike:180,run:42.2},KM_MI=1.609344,M_YD=.9144,DAY=864e5;
+const DIST={sprint:{n:'Sprint',swim:.75,bike:20,run:5,w:12,t:{swim:1.5,bike:2.5,run:2,brick:.5,strength:1,other:0}},olympic:{n:'Olympic',swim:1.5,bike:40,run:10,w:16,t:{swim:2,bike:4,run:3,brick:.5,strength:1,other:0}},half:{n:'Half (113 km)',swim:1.9,bike:90,run:21.1,w:20,t:{swim:2.5,bike:5.5,run:3.5,brick:1,strength:1,other:0}},full:{n:'Full (226 km)',swim:3.8,bike:180,run:42.2,w:30,t:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}}},KM_MI=1.609344,M_YD=.9144,DAY=864e5;
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
-const col=t=>`var(--${t})`;
-let entries=load(KEY,[]),S=Object.assign({units:'metric',swimUnit:'m',raceName:'',raceDate:'',planStart:'',planWeeks:30,targets:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}},load(SKEY,{}));
+const col=t=>`var(--${t})`,D0=()=>DIST[S.raceDist]||DIST.full;
+let entries=load(KEY,[]),S=Object.assign({raceDist:'full',units:'metric',swimUnit:'m',raceName:'',raceDate:'',planStart:'',planWeeks:30,targets:{swim:3,bike:7,run:4,brick:1,strength:1,other:0}},load(SKEY,{}));
 let period='week',shown=50,dirty=true;
 function load(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
 // migrate v1 entries
@@ -54,11 +54,12 @@ function renderList(){if(dirty){sorted=[...entries].sort((a,b)=>b.date.localeCom
  const f=$('#filter').value,l=f?sorted.filter(e=>e.type===f):sorted;
  $('#entries').innerHTML=l.length?l.slice(0,shown).map(e=>{const bits=[hm(e.duration)];if(e.distance)bits.push(distStr(e.type,e.distance));const p=pace(e);if(p)bits.push(p);
   const sub=[e.hr?`♥ ${e.hr}`:'',e.rpe?`RPE ${e.rpe}`:'',e.calories?`${e.calories} kcal`:'',esc(e.notes)].filter(Boolean).join(' · ');
-  return`<div class="entry"><span class="badge" style="background:${col(e.type)}">${e.type}</span><div class="info"><div><b>${bits.join(' · ')}</b> <span class="muted">${e.date}</span></div><div class="sub">${sub}</div></div><button data-edit="${e.id}" aria-label="Edit ${e.type} on ${e.date}">✎</button><button class="danger" data-del="${e.id}" aria-label="Delete ${e.type} on ${e.date}">✕</button></div>`}).join(''):'<div class="empty">No sessions yet. Add one above, or load sample data in Settings.</div>';
+  return`<div class="entry"><span class="badge" style="background:${col(e.type)}">${e.type}</span><div class="info"><div><b>${bits.join(' · ')}</b> <span class="muted">${e.date}</span></div><div class="sub">${sub}</div></div><button data-edit="${e.id}" aria-label="Edit ${e.type} on ${e.date}">✎</button><button class="danger" data-del="${e.id}" aria-label="Delete ${e.type} on ${e.date}">✕</button></div>`}).join(''):'<div class="empty"><span class="ico">🏁</span><b>No sessions yet</b><br>Pick a discipline above and log your first workout.<br><button type="button" data-goto="settings">Or try sample data</button></div>';
  $('#moreBtn').hidden=l.length<=shown;$('#moreBtn').textContent=`Show more (${l.length-shown} older)`}
 $('#entries').addEventListener('click',e=>{const ed=e.target.closest('[data-edit]'),de=e.target.closest('[data-del]');
  if(ed){const o=entries.find(x=>x.id===ed.dataset.edit);fill(o,true);$('#eid').value=o.id;$('#saveBtn').textContent='Save changes';$('#formTitle').textContent='Edit session';$('#cancelEdit').hidden=false;scrollTo({top:0,behavior:'smooth'});$('#duration').focus({preventScroll:true})}
  if(de&&confirm('Delete this session?')){entries=entries.filter(x=>x.id!==de.dataset.del);persist()}});
+document.addEventListener('click',e=>{const g=e.target.closest('[data-goto]');if(g)document.querySelector(`[data-view=${g.dataset.goto}]`).click()});
 $('#moreBtn').onclick=()=>{shown+=100;renderList()};$('#filter').onchange=()=>{shown=50;renderList()};
 // ---------- navigation ----------
 $$('[role=tab]').forEach(b=>b.onclick=()=>{$$('[role=tab]').forEach(x=>x.setAttribute('aria-selected',x===b));$$('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+b.dataset.view));render()});
@@ -72,18 +73,18 @@ function shift(d,p,n){const x=new Date(d);if(p==='week')x.setDate(x.getDate()+7*
 function startOf(d,p){return p==='week'?monday(d):p==='month'?new Date(d.getFullYear(),d.getMonth(),1):new Date(d.getFullYear(),0,1)}
 function plan(){const first=sorted.length?sorted[sorted.length-1].date:null,startStr=S.planStart||first;if(!startStr)return null;
  const start=monday(parse(startStr));let end,weeks;
- if(S.raceDate){const r=parse(S.raceDate);weeks=Math.max(1,Math.ceil((r-start+DAY)/(7*DAY)));end=r}else{weeks=+S.planWeeks||30;end=new Date(start.getTime()+weeks*7*DAY)}
+ if(S.raceDate){const r=parse(S.raceDate);weeks=Math.max(1,Math.ceil((r-start+DAY)/(7*DAY)));end=r}else{weeks=+S.planWeeks||D0().w;end=new Date(start.getTime()+weeks*7*DAY)}
  const t=today(),wk=Math.floor((t-start)/(7*DAY))+1,months=Math.max(1,Math.round(weeks/4.345)),mo=Math.min(months,Math.floor((wk-1)/4.345)+1);
  return{start,end,weeks,wk,mo,months,days:Math.ceil((end-t)/DAY)}}
 function phase(wk,n){const f=wk/n;return wk<1?'Pre-plan':wk>n?'Post-race / recovery':f<=.35?'Base':f<=.7?'Build':f<=.9?'Peak':'Taper'}
 function renderRace(){const p=plan(),el=$('#race');
- if(!p){el.innerHTML=`<div><h2>Training plan</h2><p class="muted">Log your first session (or set a plan start in Settings) to start a ${S.planWeeks||30}-week plan. Race date is optional.</p></div>`;return}
+ if(!p){el.innerHTML=`<div><h2>Training plan</h2><p class="muted">Log your first session (or set a plan start in Settings) to start a ${S.planWeeks||D0().w}-week plan. Race date is optional.</p></div>`;return}
  const wkTxt=p.wk<1?`Starts in ${1-p.wk} wk`:p.wk>p.weeks?'Plan complete':`Week ${p.wk} of ${p.weeks}`,moTxt=p.wk<1?'':`Month ${Math.max(1,p.mo)} of ${p.months}`;
  const pct=Math.min(100,Math.max(0,(p.wk-1)/p.weeks*100));
- el.innerHTML=`<div style="flex:1;min-width:220px"><h2>${esc(S.raceName)||(S.raceDate?'Race':'Ironman plan')}</h2><div class="muted">${S.raceDate?`Race day ${parse(S.raceDate).toLocaleDateString(undefined,{dateStyle:'medium'})}`:`No race date set — ${p.weeks}-week plan from ${p.start.toLocaleDateString()}`} · Phase: <b>${phase(p.wk,p.weeks)}</b></div>
- <div class="track" style="margin-top:10px" role="progressbar" aria-label="Plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><div style="width:${pct}%;background:var(--acc2)"></div></div></div>
+ el.innerHTML=`<div style="flex:1;min-width:220px"><h2>${esc(S.raceName)||(S.raceDate?'Race':`${D0().n} triathlon plan`)}</h2><div class="muted">${S.raceDate?`Race day ${parse(S.raceDate).toLocaleDateString(undefined,{dateStyle:'medium'})}`:`No race date set — ${p.weeks}-week plan from ${p.start.toLocaleDateString()}`} · Phase: <b>${phase(p.wk,p.weeks)}</b></div>
+ <div class="track" style="margin-top:10px" role="progressbar" aria-label="Plan progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct)}"><div style="width:${pct}%;background:linear-gradient(90deg,var(--acc),var(--hi))"></div></div></div>
  <div class="big"><div><b>${wkTxt.replace(/^Week /,'')}</b><span class="muted">${p.wk>=1&&p.wk<=p.weeks?'Training week':wkTxt}</span></div>${moTxt?`<div><b>${moTxt.replace(/^Month /,'')}</b><span class="muted">Month</span></div>`:''}<div><b>${Math.max(0,p.days)}</b><span class="muted">Days ${S.raceDate?'to race':'left in plan'} · ${Math.max(0,Math.ceil(p.days/7))} wk</span></div></div>`}
-function chg(c,p){if(!p&&!c)return'<span class="muted">—</span>';if(!p)return'<span style="color:var(--acc2)">new</span>';const d=Math.round((c-p)/p*100);return`<span style="color:${d>=0?'var(--acc2)':'var(--danger)'}">${d>=0?'▲':'▼'} ${Math.abs(d)}%</span>`}
+function chg(c,p){if(!p&&!c)return'<span class="muted">—</span>';if(!p)return'<span style="color:var(--ok)">new</span>';const d=Math.round((c-p)/p*100);return`<span style="color:${d>=0?'var(--ok)':'var(--danger)'}">${d>=0?'▲':'▼'} ${Math.abs(d)}%</span>`}
 function renderProgress(){if(dirty)renderList();renderRace();
  const t=today(),start=startOf(t,period),end=shift(start,period,1),prevS=shift(start,period,-1),cur=agg(inR(start,end)),ptd=Math.min(end-start,t-start+DAY),prev=agg(inR(prevS,new Date(prevS.getTime()+ptd)));
  const pname={week:'week',month:'month',year:'year'}[period];
@@ -99,23 +100,24 @@ function renderProgress(){if(dirty)renderList();renderRace();
  $('#legend').innerHTML=TYPES.map(ty=>`<span><i style="background:${col(ty)}"></i>${ty}</span>`).join('');
  // breakdown with change
  $('#bdTitle').textContent=`Breakdown · vs same point last ${pname}`;const tm=Math.max(1,...TYPES.map(ty=>cur.by[ty].minutes));
- $('#breakdown').innerHTML=TYPES.filter(ty=>cur.by[ty].sessions||prev.by[ty].sessions).map(ty=>{const b=cur.by[ty];return`<div class="brow"><span>${ty}</span><div class="track"><div style="width:${b.minutes/tm*100}%;background:${col(ty)}"></div></div><span class="muted">${hm(b.minutes)} · ${chg(b.minutes,prev.by[ty].minutes)}</span></div>`}).join('')||'<div class="empty">No sessions this period.</div>';
+ $('#breakdown').innerHTML=TYPES.filter(ty=>cur.by[ty].sessions||prev.by[ty].sessions).map(ty=>{const b=cur.by[ty];return`<div class="brow"><span>${ty}</span><div class="track"><div style="width:${b.minutes/tm*100}%;background:${col(ty)}"></div></div><span class="muted">${hm(b.minutes)} · ${chg(b.minutes,prev.by[ty].minutes)}</span></div>`}).join('')||'<div class="empty"><span class="ico">🌱</span>Nothing logged this period yet — every block starts with one session.</div>';
  // targets (always this week)
  const w=agg(inR(monday(t),new Date(monday(t).getTime()+7*DAY)));
  $('#targets').innerHTML=TYPES.filter(ty=>+S.targets[ty]>0||w.by[ty].minutes).map(ty=>{const h=w.by[ty].minutes/60,tg=+S.targets[ty]||0,p=tg?Math.min(100,h/tg*100):100;return`<div class="brow"><span>${ty}</span><div class="track" role="progressbar" aria-label="${ty} hours vs target" aria-valuenow="${Math.round(p)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p}%;background:${col(ty)}"></div></div><span class="muted">${r1(h)} / ${tg||'–'} h${tg&&h>=tg?' ✓':''}</span></div>`}).join('');
+ $('#longTitle').textContent=`Long sessions vs ${D0().n.split(' ')[0].toLowerCase()} distance`;
  // long sessions
  $('#longs').innerHTML=MAIN.map(ty=>{const l=entries.filter(e=>(e.type===ty||(ty==='run'&&e.type==='brick'))&&e.distance);const best=l.reduce((a,e)=>!a||e.distance>a.distance?e:a,null),
-  r28=l.filter(e=>parse(e.date)>=new Date(t-28*DAY)).reduce((a,e)=>Math.max(a,e.distance),0),p=best?Math.min(100,best.distance/IM[ty]*100):0;
-  return`<div class="brow"><span>${ty}</span><div class="track" role="progressbar" aria-label="Longest ${ty} as percent of Ironman distance" aria-valuenow="${Math.round(p)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p}%;background:${col(ty)}"></div></div><span class="muted">${best?distStr(ty,best.distance):'—'} / ${distStr(ty,IM[ty])}</span></div><div class="muted" style="margin:-6px 0 6px 84px">${best?`${Math.round(p)}% · best ${best.date} · last 4 wk ${r28?distStr(ty,r28):'—'}`:'No sessions with distance'}</div>`}).join('');
+  r28=l.filter(e=>parse(e.date)>=new Date(t-28*DAY)).reduce((a,e)=>Math.max(a,e.distance),0),p=best?Math.min(100,best.distance/D0()[ty]*100):0;
+  return`<div class="brow"><span>${ty}</span><div class="track" role="progressbar" aria-label="Longest ${ty} as percent of race distance" aria-valuenow="${Math.round(p)}" aria-valuemin="0" aria-valuemax="100"><div style="width:${p}%;background:${col(ty)}"></div></div><span class="muted">${best?distStr(ty,best.distance):'—'} / ${distStr(ty,D0()[ty])}</span></div><div class="muted" style="margin:-6px 0 6px 84px">${best?`${Math.round(p)}% · best ${best.date} · last 4 wk ${r28?distStr(ty,r28):'—'}`:'No sessions with distance'}</div>`}).join('');
  // streaks
  const days=new Set(entries.map(e=>e.date)),d=new Date();let cs=0;if(!days.has(iso(d)))d.setDate(d.getDate()-1);while(days.has(iso(d))){cs++;d.setDate(d.getDate()-1)}
  let best=0,run=0,pv=null;[...days].sort().forEach(s=>{const x=parse(s);run=pv&&(x-pv)/DAY<1.5?run+1:1;best=Math.max(best,run);pv=x});
  const wks=new Set([...days].map(s=>iso(monday(parse(s)))));let ws=0,wd=monday(t);if(!wks.has(iso(wd)))wd.setDate(wd.getDate()-7);while(wks.has(iso(wd))){ws++;wd.setDate(wd.getDate()-7)}
  $('#streaks').innerHTML=`<div class="big"><div><b>${cs}</b><span class="muted">Day streak</span></div><div><b>${best}</b><span class="muted">Longest day streak</span></div><div><b>${ws}</b><span class="muted">Active-week streak</span></div></div>`}
 // ---------- settings ----------
-function fillSettings(){['raceName','raceDate','planStart','planWeeks','units','swimUnit'].forEach(k=>$('#'+k).value=S[k]??'');TYPES.forEach(t=>$('#tg-'+t).value=S.targets[t]??0)}
-$('#setForm').onsubmit=e=>{e.preventDefault();['raceName','raceDate','planStart','units','swimUnit'].forEach(k=>S[k]=$('#'+k).value);S.planWeeks=+$('#planWeeks').value||30;TYPES.forEach(t=>S.targets[t]=+$('#tg-'+t).value||0);saveS();setUnitLbl();flash('#setStatus','Saved ✓')};
-$('#exportBtn').onclick=()=>{const b=new Blob([JSON.stringify({app:'im-tracker',version:2,exported:new Date().toISOString(),settings:S,entries},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`im-tracker-backup-${iso(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+function fillSettings(){['raceName','raceDist','raceDate','planStart','planWeeks','units','swimUnit'].forEach(k=>$('#'+k).value=S[k]??'');TYPES.forEach(t=>$('#tg-'+t).value=S.targets[t]??0)}
+$('#setForm').onsubmit=e=>{e.preventDefault();['raceName','raceDist','raceDate','planStart','units','swimUnit'].forEach(k=>S[k]=$('#'+k).value);S.planWeeks=+$('#planWeeks').value||D0().w;TYPES.forEach(t=>S.targets[t]=+$('#tg-'+t).value||0);saveS();setUnitLbl();flash('#setStatus','Saved ✓')};
+$('#exportBtn').onclick=()=>{const b=new Blob([JSON.stringify({app:'tripace',version:2,exported:new Date().toISOString(),settings:S,entries},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`tripace-backup-${iso(new Date())}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
 $('#importBtn').onclick=()=>$('#importFile').click();
 $('#importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text()),l=Array.isArray(j)?j:j.entries;if(!Array.isArray(l))throw 0;
  const ok=l.filter(x=>x&&x.date&&/^\d{4}-\d{2}-\d{2}$/.test(x.date)&&+x.duration>0).map(x=>({...x,id:String(x.id||Math.random()),type:TYPES.includes(x.type)?x.type:x.type==='cycle'?'bike':'other',duration:+x.duration}));
@@ -124,7 +126,7 @@ $('#importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{c
  if(j.settings&&replace)S=Object.assign(S,j.settings);localStorage.setItem(SKEY,JSON.stringify(S));fillSettings();persist();alert('Import complete')}catch{alert('Not a valid backup file')}e.target.value=''};
 $('#clearBtn').onclick=()=>{if(entries.length&&confirm('Delete ALL sessions? Export a backup first if unsure.')){entries=[];persist()}};
 $('#clearSampleBtn').onclick=()=>{const n=entries.filter(e=>e.sample).length;if(!n)return alert('No sample data present');entries=entries.filter(e=>!e.sample);persist()};
-$('#sampleBtn').onclick=()=>{if(!confirm('Load a generated 20-week SAMPLE Ironman build? Existing sample entries are replaced; your own sessions are kept.'))return;
+$('#sampleBtn').onclick=()=>{if(!confirm('Load a generated 20-week SAMPLE full-distance build? Existing sample entries are replaced; your own sessions are kept.'))return;
  let seed=42;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647,j=(a,b)=>a+(b-a)*rnd();
  entries=entries.filter(e=>!e.sample);const t=today(),start=new Date(monday(t).getTime()-19*7*DAY),W=20;
  const add=(d,type,dur,kmPerMin,hr,rpe,note)=>{if(d>t||rnd()<.06)return;dur=Math.round(dur/5)*5;entries.push({id:'sample-'+iso(d)+'-'+type+'-'+entries.length,sample:true,type,date:iso(d),duration:dur,distance:kmPerMin?Math.round(dur*kmPerMin*j(.95,1.05)*100)/100:null,hr:hr?Math.round(j(hr-4,hr+4)):null,rpe,calories:Math.round(dur*j(8,11)),notes:'[sample] '+note})};
@@ -136,8 +138,20 @@ $('#sampleBtn').onclick=()=>{if(!confirm('Load a generated 20-week SAMPLE Ironma
   add(D(4),'swim',60*s,.026,0,5,'Open-water skills / sighting');
   const lr=Math.min(330,(150+190*w/(W-1)))*(rec?.65:1);add(D(5),'bike',lr,.45,132,6,`Long ride Z2 — ${ph}`);add(D(5),'brick',Math.min(45,15+w*1.6)*(rec?.6:1),.172,150,7,'Brick run off the bike');
   add(D(6),'run',Math.min(165,70+100*w/(W-1))*(rec?.7:1),.163,140,6,`Long run Z2 — ${ph}`)}
- if(!S.planStart){S.planStart=iso(start);localStorage.setItem(SKEY,JSON.stringify(S));fillSettings()}persist();alert('Sample data loaded (tagged [sample]). See the Progress tab.')};
+ if(!S.planStart||S.sampleStart===S.planStart||S.planStart>iso(start)){S.planStart=S.sampleStart=iso(start);localStorage.setItem(SKEY,JSON.stringify(S));fillSettings()}persist();alert('Sample data loaded (tagged [sample]). See the Progress tab.')};
+// ---------- onboarding ----------
+const distOpts=Object.entries(DIST).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');$('#raceDist').innerHTML=distOpts;$('#obDist').innerHTML=distOpts;
+$('#obTargets').innerHTML=TYPES.filter(t=>t!=='other').map(t=>`<label style="text-transform:capitalize">${t}<input type="number" min="0" max="60" step="0.5" inputmode="decimal" id="ob-${t}"></label>`).join('');
+const obT=()=>{const d=DIST[$('#obDist').value];TYPES.filter(t=>t!=='other').forEach(t=>$('#ob-'+t).value=d.t[t]);$('#obWeeks').value=d.w};
+$('#obDist').onchange=obT;
+function openOnboard(){$('#obDist').value=S.raceDist;$('#obRace').value=S.raceDate;$('#obStart').value=S.planStart||iso(monday(today()));$('#obUnits').value=S.units;$('#obSwim').value=S.swimUnit;obT();if(S.onboarded){TYPES.filter(t=>t!=='other').forEach(t=>$('#ob-'+t).value=S.targets[t]);$('#obWeeks').value=S.planWeeks}$('#onboard').showModal()}
+const obSave=()=>{Object.assign(S,{onboarded:true,raceDist:$('#obDist').value,raceDate:$('#obRace').value,planStart:$('#obStart').value,planWeeks:+$('#obWeeks').value||DIST[$('#obDist').value].w,units:$('#obUnits').value,swimUnit:$('#obSwim').value});TYPES.filter(t=>t!=='other').forEach(t=>S.targets[t]=+$('#ob-'+t).value||0);localStorage.setItem(SKEY,JSON.stringify(S));fillSettings();setUnitLbl();render()};
+$('#obForm').onsubmit=()=>{obSave();flash('#status','Plan saved — log your first session!')};
+$('#obSample').onclick=()=>{obSave();$('#onboard').close();document.querySelector('[data-view=settings]').click();$('#sampleBtn').click()};
+$('#onboard').addEventListener('cancel',()=>{S.onboarded=true;localStorage.setItem(SKEY,JSON.stringify(S))});
+$('#setupBtn').onclick=openOnboard;
 function render(){renderList();if($('#view-progress').classList.contains('active'))renderProgress()}
 fillSettings();setUnitLbl();render();
+if(!S.onboarded){if(entries.length||localStorage.getItem(SKEY)){S.onboarded=true;localStorage.setItem(SKEY,JSON.stringify(S))}else openOnboard()}
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 })();
