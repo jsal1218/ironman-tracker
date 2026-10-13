@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ironman Training Tracker</title>
+<meta name="description" content="Offline-first Ironman triathlon training log: swim, bike, run, brick and strength sessions with pace, weekly targets, long-session progress and race countdown.">
+<meta name="theme-color" content="#0f1220"><meta name="color-scheme" content="dark light">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="IM Tracker">
+<link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+:root{--bg:#0f1220;--card:#181c2e;--line:#2c3150;--text:#eef0f7;--muted:#a9afcb;--acc:#4f7dff;--acc2:#38d9a9;--danger:#ff8080;--swim:#22b8cf;--bike:#38d9a9;--run:#5b8cff;--brick:#f783ac;--strength:#f59f00;--other:#9aa1ad}
+@media (prefers-color-scheme:light){:root{--bg:#f3f5fb;--card:#fff;--line:#d5dae8;--text:#151826;--muted:#4f5573;--acc:#2f5fe0;--danger:#c92a2a}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);padding-bottom:env(safe-area-inset-bottom)}
+.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;z-index:9;background:var(--acc);color:#fff;padding:8px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+h1{font-size:1.15rem;margin:0}h2{font-size:1rem;margin:0 0 12px}h3{font-size:.9rem;margin:12px 0 6px;color:var(--muted)}
+main{max-width:1040px;margin:auto;padding:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.view{display:none}.view.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}.wide{grid-column:1/-1}
+label,.lbl{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:4px}
+input,select,button{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
+input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--acc2);outline-offset:2px}
+button{cursor:pointer;touch-action:manipulation}button:hover{border-color:var(--acc)}.primary{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}.danger{color:var(--danger)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.between{justify-content:space-between}.card>.row:first-child{margin-top:0}
+.seg{display:inline-flex}.seg button{border-radius:0;margin-left:-1px}.seg button:first-child{border-radius:10px 0 0 10px}.seg button:last-child{border-radius:0 10px 10px 0}
+.seg [aria-selected=true],.seg [aria-pressed=true]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips input{position:absolute;opacity:0;width:1px;height:1px}
+.chips label{flex-direction:row;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:99px;color:var(--text);cursor:pointer;font-size:.9rem;text-transform:capitalize}
+.chips input:checked+label{background:var(--acc);border-color:var(--acc);color:#fff}.chips input:focus-visible+label{outline:3px solid var(--acc2)}
+.chip{border-radius:99px;padding:6px 12px;font-size:.85rem}
+details summary{cursor:pointer;color:var(--muted);min-height:44px;display:flex;align-items:center}
+.entry{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);content-visibility:auto;contain-intrinsic-size:auto 64px}
+.badge{font-size:.75rem;padding:3px 8px;border-radius:99px;color:#0b0d16;font-weight:600;text-transform:capitalize;min-width:64px;text-align:center}
+.entry .info{flex:1;min-width:0}.sub{color:var(--muted);font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry button{min-width:44px}.muted{color:var(--muted);font-size:.85rem}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}.stat b{display:block;font-size:1.4rem}.stat span{color:var(--muted);font-size:.8rem}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.two .card{margin:0}
+.chartbox{aspect-ratio:600/250;width:100%}.chartbox svg{display:block;width:100%;height:100%}svg text{fill:var(--muted);font-size:11px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
+.brow{display:grid;grid-template-columns:76px 1fr 120px;gap:8px;align-items:center;margin:10px 0;font-size:.85rem}.brow>span:first-child{text-transform:capitalize}
+.track{background:var(--bg);border-radius:99px;height:10px;overflow:hidden;position:relative}.track div{height:100%;border-radius:99px}
+.big{display:flex;justify-content:space-around;text-align:center;gap:8px}.big b{font-size:1.9rem;display:block;color:var(--acc2);white-space:nowrap}
+.race{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+#typeChips{min-height:94px}#durChips{min-height:44px}#entries{min-height:110px}
+@media(min-width:520px){#typeChips{min-height:44px}}
+.empty{color:var(--muted);text-align:center;padding:20px}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media(max-width:760px){.stats{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}.brow{grid-template-columns:64px 1fr 104px}main{padding:10px}.card{padding:14px}}
+@media(max-width:420px){.big b{font-size:1.35rem}.stats{grid-template-columns:1fr 1fr}.stat b{font-size:1.2rem}}
+</style></head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header><h1>🏊🚴🏃 Ironman Tracker</h1>
+<nav class="seg" role="tablist" aria-label="Sections"><button role="tab" aria-selected="true" aria-controls="view-log" data-view="log">Log</button><button role="tab" aria-selected="false" aria-controls="view-progress" data-view="progress">Progress</button><button role="tab" aria-selected="false" aria-controls="view-settings" data-view="settings">Settings</button></nav></header>
+<main id="main">
+<section id="view-log" class="view active" role="tabpanel" aria-label="Log">
+ <form id="form" class="card" autocomplete="off">
+  <div class="row between"><h2 id="formTitle">Quick add session</h2><button type="button" id="repeatBtn" class="chip">↻ Repeat last</button></div>
+  <fieldset style="border:0;padding:0;margin:0 0 12px"><legend class="sr">Discipline</legend><div class="chips" id="typeChips"></div></fieldset>
+  <div class="grid">
+   <label>Date<input type="date" id="date" required></label>
+   <label>Duration (min)<input type="number" id="duration" min="1" max="1440" inputmode="numeric" required></label>
+   <label><span>Distance (<span id="distUnit">km</span>)</span><input type="number" id="distance" min="0" step="any" inputmode="decimal" placeholder="optional"></label>
+  </div>
+  <div class="row" aria-label="Duration presets" role="group"><span class="muted">Min:</span><span id="durChips" class="chips"></span></div>
+  <details><summary>More: heart rate, RPE, calories, notes</summary><div class="grid">
+   <label>Avg HR (bpm)<input type="number" id="hr" min="30" max="230" inputmode="numeric" placeholder="optional"></label>
+   <label>RPE (1–10)<select id="rpe"><option value="">—</option>
+   </select></label>
+   <label>Calories<input type="number" id="calories" min="0" inputmode="numeric" placeholder="optional"></label>
+   <label class="wide">Notes<input id="notes" maxlength="300" placeholder="e.g. Z2 long ride, 4×1 km threshold"></label></div></details>
+  <input type="hidden" id="eid">
+  <div class="row"><button type="submit" class="primary" id="saveBtn">Add session</button><button type="button" id="cancelEdit" hidden>Cancel edit</button><span id="status" class="muted" role="status" aria-live="polite"></span></div>
+ </form>
+ <div class="card">
+  <div class="row between"><h2>Sessions</h2><label class="sr" for="filter">Filter</label><select id="filter" aria-label="Filter by discipline"><option value="">All disciplines</option></select></div>
+  <div id="entries"></div><div class="row"><button id="moreBtn" hidden>Show more</button></div>
+ </div>
+</section>
+<section id="view-progress" class="view" role="tabpanel" aria-label="Progress">
+ <div class="card race" id="race"></div>
+ <div class="card row between"><div class="seg" id="period" role="group" aria-label="Period"><button data-p="week" aria-pressed="true">Weekly</button><button data-p="month" aria-pressed="false">Monthly</button><button data-p="year" aria-pressed="false">Yearly</button></div><span id="rangeLbl" class="muted"></span></div>
+ <div class="stats" id="stats" aria-live="polite"></div>
+ <div class="card"><div class="row between"><h2>Volume over time</h2><select id="metric" aria-label="Chart metric"><option value="hours">Hours</option><option value="sessions">Sessions</option><option value="calories">Calories</option></select></div><div class="chartbox" id="chart"></div><div class="legend" id="legend"></div></div>
+ <div class="two"><div class="card"><h2>This week vs targets</h2><div id="targets"></div></div>
+ <div class="card"><h2>Long sessions vs Ironman</h2><div id="longs"></div></div></div>
+ <div class="two"><div class="card"><h2 id="bdTitle">Breakdown by discipline</h2><div id="breakdown"></div></div>
+ <div class="card"><h2>Consistency</h2><div id="streaks"></div></div></div>
+</section>
+<section id="view-settings" class="view" role="tabpanel" aria-label="Settings">
+ <form class="card" id="setForm"><h2>Race &amp; plan</h2><div class="grid">
+  <label>Race name<input id="raceName" placeholder="e.g. IRONMAN Lake Placid"></label><label>Race date (optional)<input type="date" id="raceDate"></label><label>Plan start (blank = first session)<input type="date" id="planStart"></label><label>Plan length (weeks, if no race date)<input type="number" id="planWeeks" min="4" max="104" inputmode="numeric" placeholder="30"></label></div>
+  <h2 style="margin-top:18px">Units</h2><div class="grid">
+  <label>Bike / run<select id="units"><option value="metric">Kilometres (km, km/h, /km)</option><option value="imperial">Miles (mi, mph, /mi)</option></select></label>
+  <label>Swim<select id="swimUnit"><option value="m">Metres (/100m)</option><option value="yd">Yards (/100yd)</option></select></label></div>
+  <h2 style="margin-top:18px">Weekly targets (hours)</h2><div class="grid" id="targetInputs"></div>
+  <div class="row"><button class="primary">Save settings</button><span id="setStatus" class="muted" role="status" aria-live="polite"></span></div></form>
+ <div class="card"><h2>Data</h2><p class="muted">Data is stored only in this browser (localStorage). Export a backup regularly.</p>
+  <div class="row"><button id="exportBtn">⬇ Export JSON backup</button><label class="sr" for="importFile">Import backup</label><input type="file" id="importFile" accept="application/json,.json" hidden><button id="importBtn">⬆ Import JSON backup</button></div>
+  <div class="row"><button id="sampleBtn">Load SAMPLE Ironman training data</button><button id="clearSampleBtn">Remove sample data</button><button id="clearBtn" class="danger">Delete all data</button></div>
+  <p class="muted">Sample data is a generated 20-week Ironman build (base → build → peak, recovery every 4th week) and sets the plan start if empty tagged “[sample]”. Loading it again replaces previous sample entries; your own entries are kept.</p></div>
+</section>
+</main>
+<script src="app.js" defer></script></body></html>
