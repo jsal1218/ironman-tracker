@@ -1,12 +1,18 @@
-// VERSION is stamped automatically by the git pre-commit hook (scripts/stamp-version.sh). Do not edit by hand.
-const VERSION='2026.10.13-202620-5ef760e';
-const C='dashfit-'+VERSION,CORE=['./','./index.html','./app.js','./manifest.json'],STATIC=['./icons/icon-192.png','./icons/icon-512.png','./icons/favicon-32.png','./icons/apple-touch-icon.png'];
-self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll([...CORE,...STATIC].map(u=>new Request(u,{cache:'reload'})))))});
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
-self.addEventListener('message',e=>{if(e.data==='version')e.source.postMessage({version:VERSION})});
-const isCore=u=>u.pathname.endsWith('/')||/\/(index\.html|app\.js|sw\.js|manifest\.json)$/.test(u.pathname);
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin)return;
- if(isCore(u)||e.request.mode==='navigate'){ // network-first, bypass HTTP cache (GitHub Pages max-age=600)
-  e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{if(r.ok){const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp))}return r})
-   .catch(()=>caches.match(e.request,{ignoreSearch:true}).then(r=>r||caches.match('./index.html'))));return}
- e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok){const cp=res.clone();caches.open(C).then(c=>c.put(e.request,cp))}return res})))});
+// One service worker for the whole Dash hub (scope = site root: hub, /fitness/, /nba/).
+// VERSION is stamped automatically by the git pre-commit hook. Do not edit by hand.
+const VERSION='2026.10.15-000402-c204461';
+const C='dash-'+VERSION,IMG='dash-img';
+const PRE=['./','index.html','hub.js','apps.js','manifest.json','shared/base.css','shared/update.js','fitness/','fitness/index.html','fitness/app.js','fitness/manifest.json','nba/','nba/index.html','nba/nba.js','nba/manifest.json','icons/icon-192.png','icons/icon-512.png','icons/favicon-32.png','icons/apple-touch-icon.png','icons/nba-192.png','icons/nba-512.png'];
+self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>Promise.all(PRE.map(u=>c.add(new Request(u,{cache:'reload'})).catch(()=>{})))))});
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C&&x!==IMG).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
+const fresh=u=>u.pathname.endsWith('/')||/\.(html|js|json|css)$/.test(u.pathname);
+const put=(n,req,res)=>{if(res.ok||res.type==='opaque'){const cp=res.clone();caches.open(n).then(c=>c.put(req,cp))}return res};
+self.addEventListener('fetch',e=>{const r=e.request,u=new URL(r.url);if(r.method!=='GET')return;
+ if(u.origin===location.origin){
+  if(fresh(u)||r.mode==='navigate'){ // network-first, bypass HTTP cache (GitHub Pages max-age=600); cache fallback offline
+   e.respondWith(fetch(r,{cache:'no-store'}).then(res=>put(C,r,res)).catch(()=>caches.match(r,{ignoreSearch:true}).then(x=>x||caches.match(new URL('./',self.registration.scope).href))));return}
+  e.respondWith(caches.match(r).then(x=>x||fetch(r).then(res=>put(C,r,res))));return}
+ if(u.hostname==='a.espncdn.com'&&r.destination==='image') // team logos: cache-first
+  e.respondWith(caches.open(IMG).then(c=>c.match(r).then(x=>x||fetch(r).then(res=>{c.put(r,res.clone());return res}))));
+ // live API data (site.api.espn.com) passes straight through to the network
+});

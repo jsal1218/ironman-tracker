@@ -1,116 +1,20 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>DashFit — Triathlon training tracker</title>
-<meta name="description" content="DashFit: free, offline-first triathlon training log for sprint to full-distance races: swim, bike, run, brick and strength sessions with pace, weekly targets, long-session progress and race countdown.">
-<meta name="theme-color" content="#f7f4ee" id="themeColor"><meta name="color-scheme" content="light dark"><script>try{if(localStorage.getItem("dashfit-theme")==="dark"){document.documentElement.dataset.theme="dark";document.getElementById||0}}catch(e){}</script>
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="DashFit">
+<title>Dash — your personal dashboard</title>
+<meta name="description" content="Dash: a fast, installable personal dashboard with DashFit triathlon training and DashHoops live basketball scores.">
+<meta name="theme-color" content="#f7f4ee"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Dash">
 <link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<style>
-:root{color-scheme:light;--bg:#f7f4ee;--card:#fffdf9;--card2:#fbf3e6;--line:#e4d9c8;--text:#1d1012;--muted:#5b4749;--acc:#c1121f;--acc-h:#9e0e19;--on-acc:#fff;--hi:#f4b400;--hi-text:#8a5a00;--focus:#a86f00;--danger:#b3261e;--ok:#1f7a35;--swim:#3b8fd9;--bike:#e9a800;--run:#e85d5d;--brick:#f08c00;--strength:#a970e8;--other:#9aa1ad;--shadow:0 1px 2px rgba(60,30,20,.05),0 6px 20px rgba(60,30,20,.06);--r:16px}
-:root[data-theme=dark]{color-scheme:dark;--bg:#130b0c;--card:#1d1214;--card2:#251719;--line:#3b2629;--text:#f7eeee;--muted:#c9b3b5;--acc:#d62828;--acc-h:#b81d1d;--hi:#ffc93c;--hi-text:#ffd166;--focus:#ffc93c;--danger:#ff8a8a;--ok:#7bd88f;--swim:#4dabf7;--bike:#ffc93c;--run:#ff6b6b;--brick:#ff922b;--strength:#c084fc;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.25)}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;font:16px/1.5 ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-feature-settings:'tnum';background:var(--bg);color:var(--text);padding-bottom:env(safe-area-inset-bottom)}
-.skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;z-index:9;background:var(--acc);color:#fff;padding:8px}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding:10px 16px;padding-top:max(10px,env(safe-area-inset-top));border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
-h1{font-size:1.1rem;margin:0;display:flex;align-items:center;gap:10px;letter-spacing:-.01em}h1 small{display:block;font-size:.72rem;font-weight:500;color:var(--muted);letter-spacing:0}.logo{width:34px;height:34px;flex:none}h2{font-size:1rem;margin:0 0 12px}h3{font-size:.9rem;margin:12px 0 6px;color:var(--muted)}
-main{max-width:1040px;margin:auto;padding:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}h2{letter-spacing:-.01em}
-.view{display:none}.view.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}.wide{grid-column:1/-1}
-label,.lbl{display:flex;flex-direction:column;font-size:.85rem;color:var(--muted);gap:4px}
-input,select,button{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px}
-input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
-button{cursor:pointer;touch-action:manipulation}button:hover{border-color:var(--acc)}.primary{background:var(--acc);border-color:var(--acc);color:var(--on-acc);font-weight:600}.primary:hover{background:var(--acc-h)}.danger{color:var(--danger)}
-.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}.between{justify-content:space-between}.card>.row:first-child{margin-top:0}
-.seg{display:inline-flex}.seg button{border-radius:0;margin-left:-1px}.seg button:first-child{border-radius:10px 0 0 10px}.seg button:last-child{border-radius:0 10px 10px 0}
-.seg [aria-selected=true],.seg [aria-pressed=true]{background:var(--acc);color:var(--on-acc);border-color:var(--acc);box-shadow:inset 0 -3px 0 var(--hi)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}.chips input{position:absolute;opacity:0;width:1px;height:1px}
-.chips label{flex-direction:row;align-items:center;min-height:44px;padding:0 14px;border:1px solid var(--line);border-radius:99px;color:var(--text);cursor:pointer;font-size:.9rem;text-transform:capitalize}
-.chips input:checked+label{background:var(--acc);border-color:var(--acc);color:var(--on-acc);box-shadow:inset 0 0 0 2px var(--hi)}.chips input:focus-visible+label{outline:3px solid var(--focus)}
-.chip{border-radius:99px;padding:6px 12px;font-size:.85rem}
-details summary{cursor:pointer;color:var(--muted);min-height:44px;display:flex;align-items:center}
-.entry{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);content-visibility:auto;contain-intrinsic-size:auto 64px}
-.badge{font-size:.75rem;padding:3px 8px;border-radius:99px;color:#1a0a0b;font-weight:700;text-transform:capitalize;min-width:64px;text-align:center}
-.entry .info{flex:1;min-width:0}.sub{color:var(--muted);font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.entry button{min-width:44px}.muted{color:var(--muted);font-size:.85rem}
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-.stat{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);border-top:3px solid var(--acc)}.stat b{display:block;font-size:1.4rem}.stat span{color:var(--muted);font-size:.8rem}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}.two .card{margin:0}
-.chartbox{aspect-ratio:600/250;width:100%}.chartbox svg{display:block;width:100%;height:100%}svg text{fill:var(--muted);font-size:11px}
-.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px}
-.brow{display:grid;grid-template-columns:76px 1fr 120px;gap:8px;align-items:center;margin:10px 0;font-size:.85rem}.brow>span:first-child{text-transform:capitalize}
-.track{background:var(--bg);border-radius:99px;height:10px;overflow:hidden;position:relative}.track div{height:100%;border-radius:99px}
-.big{display:flex;justify-content:space-around;text-align:center;gap:8px}.big b{font-size:1.9rem;font-weight:800;display:block;color:var(--hi-text);white-space:nowrap}
-.race{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-#typeChips{min-height:94px}#durChips{min-height:44px}#entries{min-height:110px}
-@media(min-width:520px){#typeChips{min-height:44px}}
-.empty{color:var(--muted);text-align:center;padding:26px 12px}.empty .ico{font-size:2rem;display:block;margin-bottom:6px}.empty button{margin-top:10px}
-#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:20;background:var(--acc);color:var(--on-acc);border-color:var(--acc);border-radius:99px;padding:10px 18px;box-shadow:0 6px 20px rgba(0,0,0,.25);font-weight:600}#toast[hidden]{display:none}
-footer{max-width:1040px;margin:0 auto;padding:8px 14px 28px;color:var(--muted);font-size:.78rem;text-align:center}
-dialog{border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--text);padding:0;max-width:560px;width:calc(100% - 24px);box-shadow:0 20px 60px rgba(0,0,0,.5)}dialog::backdrop{background:rgba(40,25,20,.45)}
-.ob-head{background:linear-gradient(135deg,var(--acc),#8f0f16);color:#fff;padding:20px;border-radius:20px 20px 0 0}.ob-head h2{font-size:1.3rem;margin:0}.ob-head p{margin:4px 0 0;opacity:.92}.ob-head b{color:#ffd166}
-.ob-body{padding:18px}.ob-body .grid{margin-bottom:12px}
-@media (prefers-reduced-motion:no-preference){button,.chips label,.card,.stat{transition:transform .12s ease,background-color .15s,border-color .15s,box-shadow .15s}button:active,.chips label:active{transform:scale(.97)}.track div{transition:width .6s cubic-bezier(.2,.8,.2,1)}.view.active{animation:fade .25s ease}@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}dialog[open]{animation:fade .25s ease}.stat:hover{transform:translateY(-2px)}}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-@media(max-width:760px){.stats{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}.brow{grid-template-columns:64px 1fr 104px}main{padding:10px}.card{padding:14px}}
-@media(max-width:420px){.big b{font-size:1.35rem}.stats{grid-template-columns:1fr 1fr}.stat b{font-size:1.2rem}}
-</style></head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
-<header><h1><svg class="logo" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#d62828"/><path d="M10 40c5-4 9-4 14 0s9 4 14 0 9-4 16 0" fill="none" stroke="#ffc93c" stroke-width="5" stroke-linecap="round"/><path d="M18 30 32 12l14 18" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 50h36" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg><span>DashFit<small>Triathlon training tracker</small></span></h1>
-<nav class="seg" role="tablist" aria-label="Sections"><button role="tab" aria-selected="true" aria-controls="view-log" data-view="log">Log</button><button role="tab" aria-selected="false" aria-controls="view-progress" data-view="progress">Progress</button><button role="tab" aria-selected="false" aria-controls="view-settings" data-view="settings">Settings</button></nav></header>
-<main id="main">
-<section id="view-log" class="view active" role="tabpanel" aria-label="Log">
- <form id="form" class="card" autocomplete="off">
-  <div class="row between"><h2 id="formTitle">Quick add session</h2><button type="button" id="repeatBtn" class="chip">↻ Repeat last</button></div>
-  <fieldset style="border:0;padding:0;margin:0 0 12px"><legend class="sr">Discipline</legend><div class="chips" id="typeChips"></div></fieldset>
-  <div class="grid">
-   <label>Date<input type="date" id="date" required></label>
-   <label>Duration (min)<input type="number" id="duration" min="1" max="1440" inputmode="numeric" required></label>
-   <label><span>Distance (<span id="distUnit">km</span>)</span><input type="number" id="distance" min="0" step="any" inputmode="decimal" placeholder="optional"></label>
-  </div>
-  <div class="row" aria-label="Duration presets" role="group"><span class="muted">Min:</span><span id="durChips" class="chips"></span></div>
-  <details><summary>More: heart rate, RPE, calories, notes</summary><div class="grid">
-   <label>Avg HR (bpm)<input type="number" id="hr" min="30" max="230" inputmode="numeric" placeholder="optional"></label>
-   <label>RPE (1–10)<select id="rpe"><option value="">—</option>
-   </select></label>
-   <label>Calories<input type="number" id="calories" min="0" inputmode="numeric" placeholder="optional"></label>
-   <label class="wide">Notes<input id="notes" maxlength="300" placeholder="e.g. Z2 long ride, 4×1 mi threshold"></label></div></details>
-  <input type="hidden" id="eid">
-  <div class="row"><button type="submit" class="primary" id="saveBtn">Add session</button><button type="button" id="cancelEdit" hidden>Cancel edit</button><span id="status" class="muted" role="status" aria-live="polite"></span></div>
- </form>
- <div class="card">
-  <div class="row between"><h2>Sessions</h2><label class="sr" for="filter">Filter</label><select id="filter" aria-label="Filter by discipline"><option value="">All disciplines</option></select></div>
-  <div id="entries"></div><div class="row"><button id="moreBtn" hidden>Show more</button></div>
- </div>
-</section>
-<section id="view-progress" class="view" role="tabpanel" aria-label="Progress">
- <div class="card race" id="race"></div>
- <div class="card row between"><div class="seg" id="period" role="group" aria-label="Period"><button data-p="week" aria-pressed="true">Weekly</button><button data-p="month" aria-pressed="false">Monthly</button><button data-p="year" aria-pressed="false">Yearly</button></div><span id="rangeLbl" class="muted"></span></div>
- <div class="stats" id="stats" aria-live="polite"></div>
- <div class="card"><div class="row between"><h2>Volume over time</h2><select id="metric" aria-label="Chart metric"><option value="hours">Hours</option><option value="sessions">Sessions</option><option value="calories">Calories</option></select></div><div class="chartbox" id="chart"></div><div class="legend" id="legend"></div></div>
- <div class="two"><div class="card"><h2>This week vs targets</h2><div id="targets"></div></div>
- <div class="card"><h2 id="longTitle">Long sessions vs race distance</h2><div id="longs"></div></div></div>
- <div class="two"><div class="card"><h2 id="bdTitle">Breakdown by discipline</h2><div id="breakdown"></div></div>
- <div class="card"><h2>Consistency</h2><div id="streaks"></div></div></div>
-</section>
-<section id="view-settings" class="view" role="tabpanel" aria-label="Settings">
- <form class="card" id="setForm"><h2>Race &amp; plan</h2><div class="grid">
-  <label>Race name<input id="raceName" placeholder="e.g. Lakeside Triathlon"></label><label>Race distance<select id="raceDist"></select></label><label>Race date (optional)<input type="date" id="raceDate"></label><label>Plan start (blank = first session)<input type="date" id="planStart"></label><label>Plan length (weeks, if no race date)<input type="number" id="planWeeks" min="4" max="104" inputmode="numeric" placeholder="30"></label></div>
-  <h2 style="margin-top:18px">Units</h2><div class="grid">
-  <label>Bike / run<select id="units"><option value="imperial">Miles (mi, mph, /mi)</option><option value="metric">Kilometers (km, km/h, /km)</option></select></label>
-  <label>Appearance<select id="theme"><option value="light">Light (ivory)</option><option value="dark">Dark</option></select></label><label>Swim<select id="swimUnit"><option value="yd">Yards (/100 yd)</option><option value="m">Meters (/100 m)</option></select></label><label>Week starts on<select id="weekStart"><option value="1">Monday (training week)</option><option value="0">Sunday</option></select></label></div>
-  <h2 style="margin-top:18px">Weekly targets (hours)</h2><div class="grid" id="targetInputs"></div>
-  <div class="row"><button class="primary">Save settings</button><span id="setStatus" class="muted" role="status" aria-live="polite"></span></div></form>
- <div class="card"><h2>Data</h2><p class="muted">Data is stored only in this browser (localStorage). Export a backup regularly.</p>
-  <div class="row"><button id="exportBtn">⬇ Export JSON backup</button><label class="sr" for="importFile">Import backup</label><input type="file" id="importFile" accept="application/json,.json" hidden><button id="importBtn">⬆ Import JSON backup</button></div>
-  <div class="row"><button id="sampleBtn">Load SAMPLE training data</button><button id="setupBtn">Re-run setup</button><button id="clearSampleBtn">Remove sample data</button><button id="clearBtn" class="danger">Delete all data</button></div>
-  <p class="muted">Sample data is a generated 20-week full-distance build (base → build → peak, recovery every 4th week) and sets the plan start if empty tagged “[sample]”. Loading it again replaces previous sample entries; your own entries are kept.</p></div>
-</section>
-</main>
-<dialog id="onboard" aria-labelledby="obTitle"><form method="dialog" id="obForm"><div class="ob-head"><h2 id="obTitle">Welcome to DashFit</h2><p>Set up your plan in 30 seconds. <b>Everything stays on this device.</b></p></div><div class="ob-body">
-<div class="grid"><label>Race distance<select id="obDist"></select></label><label>Race date (optional)<input type="date" id="obRace"></label><label>Plan start<input type="date" id="obStart"></label><label>Plan length (weeks)<input type="number" id="obWeeks" min="4" max="104" inputmode="numeric"></label>
-<label>Bike / run units<select id="obUnits"><option value="imperial">miles</option><option value="metric">km</option></select></label><label>Swim units<select id="obSwim"><option value="yd">yards</option><option value="m">meters</option></select></label></div>
-<h3>Weekly targets (hours) — suggested for your distance</h3><div class="grid" id="obTargets"></div>
-<div class="row between"><button type="button" id="obSample">Explore with sample data</button><button class="primary" id="obGo">Start training →</button></div></div></form></dialog>
-<footer>DashFit is an independent training tool and is not affiliated with, endorsed by, or sponsored by IRONMAN®, World Triathlon, or any race organizer. Data is stored locally in your browser. · Version <span id="appVersion">dev</span></footer>
-<button id="toast" class="toast" hidden aria-live="polite">✨ Updated — tap to reload</button>
-<script src="app.js" defer></script></body></html>
+<link rel="stylesheet" href="shared/base.css">
+<style>.hero{margin:6px 0 16px}.hero h2{font-size:1.5rem;margin:0}.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.tile{margin:0;display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--acc);min-height:190px}.tlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);min-height:56px}
+.tlink img{border-radius:12px}.tlink span:nth-child(2){flex:1}.tlink b{display:block;font-size:1.1rem}.tlink small{color:var(--muted)}.go{font-size:1.8rem;color:var(--acc)}
+.tlink:hover b{color:var(--acc)}.big b{font-size:1.6rem;color:var(--hi-text);margin-right:8px}.stack{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--card2);margin:8px 0}
+.mini{list-style:none;margin:0;padding:0}.mini li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:.92rem}.mini li:first-child{border:0}
+.widget{min-height:96px}#w-nba{min-height:196px}#today{min-height:1.5em}.soon{border:2px dashed var(--line);box-shadow:none;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);min-height:120px}</style></head>
+<body><a class="skip" href="#main">Skip to content</a>
+<header class="bar"><h1><img class="logo" src="icons/icon-192.png" width="34" height="34" alt=""><span>Dash<small>Your personal dashboard</small></span></h1></header>
+<main id="main"><div class="hero"><h2 id="greet">Hello 👋</h2><p class="muted" id="today"></p></div>
+<section class="apps" id="apps" aria-label="Apps"></section>
+<div class="card soon" style="margin-top:14px">More apps coming soon</div></main>
+<footer>Dash · Version <span data-version>dev</span> · Scores data from ESPN's public API; not affiliated with ESPN, the NBA, or IRONMAN®.</footer>
+<script src="shared/update.js" defer></script><script src="apps.js" defer></script><script src="hub.js" defer></script></body></html>
