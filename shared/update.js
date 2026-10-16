@@ -1,6 +1,6 @@
 // Shared by every Dash app: version display + fast service-worker auto-update.
 // DASH_VERSION is stamped automatically by the git pre-commit hook (scripts/stamp-version.sh). Do not edit by hand.
-const DASH_VERSION='2026.10.16-190224-9109ea0';
+const DASH_VERSION='2026.10.16-200818-5361dbb';
 (()=>{'use strict';window.DASH_VERSION=DASH_VERSION;
 const root=new URL('../',document.currentScript.src);
 // shared SVG icon helper: DASH_ICON('star','sm')

@@ -1,2 +1,0 @@
-{"name":"Dash Notes","short_name":"Notes","id":"./","start_url":"./","scope":"./","display":"standalone","background_color":"#f6f4ee","theme_color":"#0b6e4f","description":"Fast, private, offline notes.",
-"icons":[{"src":"../icons/notes-192.png","sizes":"192x192","type":"image/png"},{"src":"../icons/notes-512.png","sizes":"512x512","type":"image/png"}]}
