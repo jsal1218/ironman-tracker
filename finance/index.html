@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dash Finance — small-business money tracker</title>
+<meta name="description" content="Dash Finance: track business income and expenses, accounts, budgets, invoices, profit and loss, and Schedule C categories. Private and offline.">
+<meta name="theme-color" content="#f6f4ee"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Dash Finance">
+<link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="../icons/finance.svg"><link rel="apple-touch-icon" href="../icons/finance-192.png">
+<script src="../shared/theme.js"></script><link rel="stylesheet" href="../shared/base.css"><link rel="stylesheet" href="fin.css">
+</head><body>
+<a class="skip" href="#view">Skip to content</a>
+<header class="bar"><a class="home" href="../" aria-label="Back to Dash home"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#back"/></svg>Dash</a>
+ <h1><img class="logo" src="../icons/finance.svg" width="34" height="34" alt=""><span>Dash Finance<small id="sub">Business money, at a glance</small></span></h1>
+ <button class="iconbtn" id="lockNow" hidden aria-label="Lock now"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#lock"/></svg></button>
+ <button class="iconbtn" id="setBtn" aria-label="Settings"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#gear"/></svg></button>
+</header>
+<main id="view" tabindex="-1" aria-live="polite"><div class="skel"></div><div class="skel"></div></main>
+<nav class="tabs" aria-label="Sections">
+ <button data-tab="home" aria-current="page"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#chart"/></svg>Overview</button>
+ <button data-tab="tx"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#list"/></svg>Activity</button>
+ <button class="fab" id="addBtn" aria-label="Add transaction"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#plus"/></svg></button>
+ <button data-tab="inv"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#invoice"/></svg>Invoices</button>
+ <button data-tab="rep"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#pie"/></svg>Reports</button>
+</nav>
+<dialog id="sheet" aria-labelledby="sheetTitle"><div class="shead"><h2 id="sheetTitle">Sheet</h2><button class="iconbtn" id="sheetClose" aria-label="Close"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#close"/></svg></button></div><div id="sheetBody"></div></dialog>
+<div id="gate" class="gate" hidden><img src="../icons/finance.svg" width="64" height="64" alt=""><h2>Dash Finance is locked</h2><form id="gateForm"><label for="gatePw" class="sr">Passcode</label><input id="gatePw" type="password" inputmode="numeric" autocomplete="current-password" placeholder="Passcode"><button class="primary">Unlock</button></form><p id="gateErr" class="err" role="alert"></p></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="printArea" class="print-only"></div>
+<footer class="foot muted">Dash Finance · <span data-version></span> · Data stays on this device.</footer>
+<script src="../shared/update.js" defer></script><script src="db.js" defer></script><script src="fin.js" defer></script>
+</body></html>

@@ -18,15 +18,20 @@
 .chip.hot{background:linear-gradient(135deg,#fbe9a6,#d9b44a 55%,#b8901f);color:#2a1f00;border-color:transparent}
 main{margin-top:-18px;position:relative;min-height:100vh}
 .sect{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:18px 4px 10px;font-weight:700}
-#grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:12px;background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid var(--line);border-radius:22px;padding:16px 12px 14px;box-shadow:var(--shadow);min-height:126px}
+#grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:4px;background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid var(--line);border-radius:22px;padding:16px 6px 14px;box-shadow:var(--shadow);min-height:126px}
 .app{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--text);font-size:.74rem;font-weight:600;text-align:center;padding:4px 2px;border-radius:14px;min-height:44px}
-.app{font-size:.8rem}.app img{width:64px;height:64px;border-radius:18px;box-shadow:0 4px 12px rgba(10,58,42,.22)}.app:hover img{transform:translateY(-2px)}
+.app{font-size:.74rem;line-height:1.25;white-space:nowrap;letter-spacing:-.01em}.app img{width:60px;height:60px;border-radius:17px;box-shadow:0 4px 12px rgba(10,58,42,.22)}.app:hover img{transform:translateY(-2px)}
 #widgets{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
 .wcard{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;position:relative}
 .wcard::before{content:'';position:absolute;inset:0 0 auto;height:3px;background:var(--gold-grad)}
 .wcard>header{display:flex;align-items:center;gap:10px;padding:14px 16px 6px}.wcard>header img{border-radius:8px}.wcard h2{margin:0;font-size:1rem;margin-right:auto}
 .more{display:inline-flex;align-items:center;gap:2px;font-weight:700;font-size:.85rem;text-decoration:none;min-height:44px;padding:0 4px}
-.widget{padding:4px 16px 16px}#w-nba{min-height:118px}#w-games{min-height:228px}#w-notes{min-height:112px}
+.widget{padding:4px 16px 16px}#w-nba{min-height:118px}#w-games{min-height:228px}#w-notes{min-height:112px}#w-finance{min-height:236px}
+.fin-bal small{display:block;color:var(--muted);font-size:.78rem;font-weight:600}.fin-bal b{font-size:1.9rem;letter-spacing:-.03em;color:var(--gold-text);line-height:1.15}
+.fin-io{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0 12px}.fin-io span{display:flex;align-items:center;gap:4px;font-size:.74rem;color:var(--muted);font-weight:600}.fin-io b{display:block;font-size:1.05rem}.fin-io .fin-in{color:var(--acc)}
+.fbar{display:block;height:6px;border-radius:4px;background:var(--card2);margin-top:4px;overflow:hidden}.fbar>i{display:block;height:100%;background:var(--acc);border-radius:4px}.fbar.out>i{background:var(--gold)}
+.fqa{display:grid;grid-template-columns:auto 1fr 44px;gap:8px}.fqa #fqP{grid-column:1/3}.fqa #fqA{min-width:0}.fqa #fqP{min-width:0}.fqa .primary{grid-row:1/3;grid-column:3;height:auto}.fq-msg{grid-column:1/-1;margin:0;min-height:1.2em;font-size:.8rem}
+.fseg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px}.fseg button{border:0;background:none;min-height:36px;padding:2px 8px;font-size:.8rem;font-weight:600;color:var(--muted);border-radius:9px}.fseg button[aria-pressed=true]{background:var(--card);color:var(--text);box-shadow:var(--shadow)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}.qadd{display:flex;gap:8px;margin-bottom:6px}.qadd input{flex:1;min-width:0}
 .nlist{list-style:none;margin:0;padding:0}.nlist a{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);text-decoration:none;color:var(--text);min-height:52px}.nlist li:first-child a{border:0}.nic{width:32px;height:32px;border-radius:10px;background:var(--acc-soft);color:var(--acc);display:flex;align-items:center;justify-content:center;flex:none}.nt{min-width:0}.nt b{display:block;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nt small{display:block;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ticker{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 8px;margin:0 -4px;scrollbar-width:none}.ticker::-webkit-scrollbar{display:none}
@@ -53,4 +58,4 @@ main{margin-top:-18px;position:relative;min-height:100vh}
 <main id="main"><h2 class="sect">Apps</h2><nav id="grid" aria-label="Apps"></nav>
 <h2 class="sect">At a glance</h2><div id="widgets"></div></main>
 <footer>Dash · Version <span data-version>dev</span> · Scores from ESPN’s public API; not affiliated with ESPN or the NBA.</footer>
-<script src="shared/update.js" defer></script><script src="notes/db.js" defer></script><script src="apps.js" defer></script><script src="hub.js" defer></script></body></html>
+<script src="shared/update.js" defer></script><script src="notes/db.js" defer></script><script src="finance/db.js" defer></script><script src="apps.js" defer></script><script src="hub.js" defer></script></body></html>
