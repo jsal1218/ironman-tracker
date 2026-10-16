@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Summit Stack — tap-to-stack tower</title><meta name="description" content="Summit Stack: tap to drop sliding stone slabs and build the tallest tower. Perfect drops chain, grow your slab back, and light up the summit.">
+<meta name="theme-color" content="#0b1a15"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="icon" type="image/svg+xml" href="../../icons/summit.svg"><link rel="apple-touch-icon" href="../../icons/games-192.png">
+<script src="../../shared/theme.js"></script><link rel="stylesheet" href="../games.css">
+<style>html,body{overflow:hidden;background:#0b1a15}body{display:flex;flex-direction:column;height:100dvh}.gbar{position:absolute;top:0;left:0;right:0;z-index:5}
+.gbar .gbtn,.gbar a{background:rgba(9,30,23,.55);color:#e9c86a;border-color:rgba(233,200,106,.3)}.gbar a{padding:0 12px;border-radius:12px}.gbar .gbtn{color:#ecf2ee}
+.hud{display:flex;gap:6px;align-items:center;margin-left:6px}.pillh{background:rgba(9,30,23,.55);border:1px solid rgba(233,200,106,.3);border-radius:12px;padding:2px 12px;color:#ecf2ee;text-align:center}.pillh span{display:block;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;opacity:.8}.pillh b{font-variant-numeric:tabular-nums}
+#lives{display:flex;gap:3px;padding:6px 10px}#lives svg{width:16px;height:20px}
+.stage{flex:1;min-height:0;width:100%;border-radius:0}canvas{display:block;width:100%;height:100%;touch-action:none}</style></head>
+<body data-game="summit">
+<header class="gbar"><a href="../" aria-label="Back to Games"><svg class="i" aria-hidden="true"><use href="../../shared/icons.svg#back"/></svg>Games</a><h1 style="position:absolute;left:-999px">Summit Stack</h1>
+<div class="hud"><div class="pillh"><span>Score</span><b id="sc">0</b></div><div class="pillh"><span>Streak</span><b id="st">0</b></div></div><span style="margin-left:auto"></span><button class="gbtn" id="pause" aria-label="Pause"><svg class="i" aria-hidden="true"><use href="../../shared/icons.svg#pause"/></svg></button><button class="gbtn" id="sound"></button></header>
+<main style="flex:1;display:flex;flex-direction:column;min-height:0"><div class="stage" id="stage" role="application" aria-label="Summit Stack. Tap, click, or press Space to drop the sliding slab."><canvas id="cv"></canvas>
+<div class="overlay" id="ov" hidden><div class="panel"><h2></h2><p></p><button class="play"></button></div></div></div></main>
+<script src="../../shared/update.js" defer></script><script src="../common.js" defer></script><script src="summit.js" defer></script></body></html>

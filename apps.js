@@ -7,10 +7,13 @@ window.DASH_APPS=[
  {id:'orbit',name:'Orbit Merge',path:'games/orbit/',icon:'icons/orbit.svg',parent:'games'},
  {id:'pilot',name:'Paper Pilot',path:'games/pilot/',icon:'icons/pilot.svg',parent:'games'},
  {id:'bloom',name:'Bloom Blocks',path:'games/bloom/',icon:'icons/bloom.svg',parent:'games'},
+ {id:'glimmer',name:'Glimmer Guard',path:'games/glimmer/',icon:'icons/glimmer.svg',parent:'games'},
+ {id:'lantern',name:'Lantern Swipe',path:'games/lantern/',icon:'icons/lantern.svg',parent:'games'},
+ {id:'summit',name:'Summit Stack',path:'games/summit/',icon:'icons/summit.svg',parent:'games'},
 ];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function gamesWidget(el){const I=DASH_ICON,L=DASH_APPS.filter(a=>a.parent==='games'),bs=L.map(a=>+localStorage.getItem('dash-games-'+a.id+'-best')||0);
- el.innerHTML=`<a class="gcard" href="games/"><ul class="glist">${L.map((a,i)=>`<li><img src="${a.icon}" width="40" height="40" alt=""><span class="gn"><b>${esc(a.name)}</b><small>${bs[i]?`${I('trophy','sm')} Best ${bs[i].toLocaleString()}`:'Not played yet'}</small></span></li>`).join('')}</ul><span class="gcta">${I('play','sm')} Play in Dash Games</span></a>`}
+ el.innerHTML=`<a class="gcard" href="games/"><ul class="glist">${L.map((a,i)=>`<li><img src="${a.icon}" width="38" height="38" alt=""><span class="gn"><b>${esc(a.name)}</b><small>${bs[i]?`${I('trophy','sm')} ${bs[i].toLocaleString()}`:'Not played yet'}</small></span></li>`).join('')}</ul><span class="gcta">${I('play','sm')} Play in Dash Games</span></a>`}
 function nbaWidget(el){let timer;const I=DASH_ICON,ymd=d=>`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
  const tm=iso=>new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
  async function load(){try{const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${ymd(new Date())}`,{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),ev=d.events||[];

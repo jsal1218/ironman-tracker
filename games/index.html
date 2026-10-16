@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Dash Games — quick single-player games</title><meta name="description" content="Dash Games: Orbit Merge, Paper Pilot, and Bloom Blocks — quick, offline, touch-first single-player games.">
+<title>Dash Games — quick single-player games</title><meta name="description" content="Dash Games: Orbit Merge, Paper Pilot, Bloom Blocks, Glimmer Guard, Lantern Swipe, and Summit Stack — quick, offline, touch-first single-player games.">
 <meta name="theme-color" content="#f7f4ee"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="../icons/games.svg"><link rel="apple-touch-icon" href="../icons/games-192.png">
 <script src="../shared/theme.js"></script><link rel="stylesheet" href="../shared/base.css">
 <style>.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
@@ -17,6 +17,12 @@
 <span><b>Paper Pilot</b><p>One tap to climb. Thread a paper plane through a sunset skyline.</p><span class="best" data-best="pilot"></span></span></a>
 <a class="gcard card" href="bloom/"><img src="../icons/bloom.svg" width="84" height="84" alt="">
 <span><b>Bloom Blocks</b><p>Drag flower beds onto an 8×8 garden. Clear rows and columns, chain combos.</p><span class="best" data-best="bloom"></span></span></a>
+<a class="gcard card" href="glimmer/"><img src="../icons/glimmer.svg" width="84" height="84" alt="">
+<span><b>Glimmer Guard</b><p>Full-screen first-person arena. Tag rogue glow-drones in a night greenhouse. Best in landscape.</p><span class="best" data-best="glimmer"></span></span></a>
+<a class="gcard card" href="lantern/"><img src="../icons/lantern.svg" width="84" height="84" alt="">
+<span><b>Lantern Swipe</b><p>Slice festival lanterns mid-air, chain combos, and never cut a storm cloud.</p><span class="best" data-best="lantern"></span></span></a>
+<a class="gcard card" href="summit/"><img src="../icons/summit.svg" width="84" height="84" alt="">
+<span><b>Summit Stack</b><p>Tap to drop sliding slabs. Perfect drops chain and grow your tower back.</p><span class="best" data-best="summit"></span></span></a>
 </section><p class="muted" style="text-align:center;margin-top:16px">Original games inspired by classic genres. Best scores stay on this device. Sound is off by default.</p></main>
 <footer>Dash Games · Version <span data-version>dev</span></footer>
 <script>addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('[data-best]').forEach(e=>{const v=+localStorage.getItem('dash-games-'+e.dataset.best+'-best')||0;e.innerHTML=v?DASH_ICON('trophy','sm')+' Best '+v.toLocaleString():DASH_ICON('play','sm')+' New — play now'});
