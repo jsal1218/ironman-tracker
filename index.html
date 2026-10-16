@@ -1,20 +1,54 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Dash — your personal dashboard</title>
-<meta name="description" content="Dash: a fast, installable personal dashboard with DashFit triathlon training and DashHoops live basketball scores.">
-<meta name="theme-color" content="#f7f4ee"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Dash">
-<link rel="manifest" href="manifest.json"><link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="stylesheet" href="shared/base.css">
-<style>.hero{margin:6px 0 16px}.hero h2{font-size:1.5rem;margin:0}.apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
-.tile{margin:0;display:flex;flex-direction:column;gap:12px;border-top:4px solid var(--acc);min-height:190px}.tlink{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--text);min-height:56px}
-.tlink img{border-radius:12px}.tlink span:nth-child(2){flex:1}.tlink b{display:block;font-size:1.1rem}.tlink small{color:var(--muted)}.go{font-size:1.8rem;color:var(--acc)}
-.tlink:hover b{color:var(--acc)}.big b{font-size:1.6rem;color:var(--hi-text);margin-right:8px}.stack{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--card2);margin:8px 0}
-.mini{list-style:none;margin:0;padding:0}.mini li{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid var(--line);font-size:.92rem}.mini li:first-child{border:0}
-.widget{min-height:96px}#w-nba{min-height:196px}#w-games{min-height:110px}#today{min-height:1.5em}.soon{border:2px dashed var(--line);box-shadow:none;background:transparent;display:flex;align-items:center;justify-content:center;color:var(--muted);min-height:120px}</style></head>
+<meta name="description" content="Dash: a fast, installable personal dashboard with live basketball scores and quick single-player games.">
+<meta name="theme-color" content="#f6f4ee"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Dash">
+<link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="icons/dash.svg"><link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<script src="shared/theme.js"></script><link rel="stylesheet" href="shared/base.css">
+<style>
+.hero{position:relative;overflow:hidden;color:#f6f4ee;padding:calc(18px + env(safe-area-inset-top)) 20px 30px;border-radius:0 0 28px 28px;background:#0a3a2a;isolation:isolate}
+.hero svg.mesh{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.hero .top{display:flex;align-items:center;gap:10px;max-width:1040px;margin:0 auto}.hero .top img{border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.brand{font-weight:800;font-size:1.2rem;letter-spacing:-.02em;margin-right:auto}.brand small{display:block;font-weight:500;font-size:.72rem;opacity:.8;letter-spacing:.02em}
+.hero .iconbtn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);color:#f6f4ee;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.hero .copy{max-width:1040px;margin:22px auto 0}.hero h1{font-size:2rem;line-height:1.1;margin:0;letter-spacing:-.03em}
+.hero h1 span{background:linear-gradient(135deg,#fbe9a6,#d9b44a 55%,#b8901f);-webkit-background-clip:text;background-clip:text;color:transparent}
+#today{opacity:.85;margin:6px 0 14px;font-size:.92rem;min-height:1.4em}
+#chips{display:flex;gap:8px;flex-wrap:wrap;min-height:32px}.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:99px;font-size:.8rem;font-weight:600;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.chip.hot{background:linear-gradient(135deg,#fbe9a6,#d9b44a 55%,#b8901f);color:#2a1f00;border-color:transparent}
+main{margin-top:-18px;position:relative}
+.sect{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:18px 4px 10px;font-weight:700}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px;background:var(--glass);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid var(--line);border-radius:22px;padding:14px 10px;box-shadow:var(--shadow);min-height:118px}
+.app{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--text);font-size:.74rem;font-weight:600;text-align:center;padding:4px 2px;border-radius:14px;min-height:44px}
+.app img{border-radius:16px;box-shadow:0 4px 12px rgba(10,58,42,.22)}.app:hover img{transform:translateY(-2px)}
+#widgets{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.wcard{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;position:relative}
+.wcard::before{content:'';position:absolute;inset:0 0 auto;height:3px;background:var(--gold-grad)}
+.wcard>header{display:flex;align-items:center;gap:10px;padding:14px 16px 6px}.wcard>header img{border-radius:8px}.wcard h2{margin:0;font-size:1rem;margin-right:auto}
+.more{display:inline-flex;align-items:center;gap:2px;font-weight:700;font-size:.85rem;text-decoration:none;min-height:44px;padding:0 4px}
+.widget{padding:4px 16px 16px}#w-nba{min-height:122px}#w-games{min-height:200px}
+.ticker{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 8px;margin:0 -4px;scrollbar-width:none}.ticker::-webkit-scrollbar{display:none}
+.tk{scroll-snap-align:start;flex:none;min-width:132px;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:16px;background:var(--card2);border:1px solid var(--line);text-decoration:none;color:var(--text)}
+.tk.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}.tk-t{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;font-size:.9rem}.tk-t img{object-fit:contain}
+.tk-s{font-weight:800;font-size:1rem}.tk-s.w{color:var(--gold-text)}.tk .pill{align-self:flex-start;margin-top:2px}
+.glist{list-style:none;margin:0;padding:0}.glist a{display:flex;align-items:center;gap:12px;padding:8px 0;text-decoration:none;color:var(--text);border-top:1px solid var(--line);min-height:56px}.glist li:first-child a{border:0}
+.glist img{border-radius:11px}.gn{flex:1}.gn b{display:block;font-size:.95rem}.gn small{color:var(--gold-text);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.gplay{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--acc);color:var(--on-acc)}
+@media (prefers-reduced-motion:no-preference){.app img{transition:transform .2s}.hero .orb{animation:drift 18s ease-in-out infinite alternate}@keyframes drift{to{transform:translate(30px,-20px) scale(1.08)}}}
+</style></head>
 <body><a class="skip" href="#main">Skip to content</a>
-<header class="bar"><h1><img class="logo" src="icons/icon-192.png" width="34" height="34" alt=""><span>Dash<small>Your personal dashboard</small></span></h1></header>
-<main id="main"><div class="hero"><h2 id="greet">Hello 👋</h2><p class="muted" id="today"></p></div>
-<section class="apps" id="apps" aria-label="Apps"></section>
-<div class="card soon" style="margin-top:14px">More apps coming soon</div></main>
-<footer>Dash · Version <span data-version>dev</span> · Scores data from ESPN's public API; not affiliated with ESPN, the NBA, or IRONMAN®.</footer>
+<header class="hero">
+<svg class="mesh" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>
+<radialGradient id="m1" cx=".2" cy=".1" r=".7"><stop offset="0" stop-color="#1c9a6c"/><stop offset="1" stop-color="#1c9a6c" stop-opacity="0"/></radialGradient>
+<radialGradient id="m2" cx=".9" cy=".2" r=".6"><stop offset="0" stop-color="#d9b44a" stop-opacity=".55"/><stop offset="1" stop-color="#d9b44a" stop-opacity="0"/></radialGradient>
+<radialGradient id="m3" cx=".6" cy="1" r=".7"><stop offset="0" stop-color="#0f6b4b"/><stop offset="1" stop-color="#0f6b4b" stop-opacity="0"/></radialGradient>
+<linearGradient id="ln" x1="0" x2="1"><stop offset="0" stop-color="#fbe9a6" stop-opacity="0"/><stop offset=".5" stop-color="#fbe9a6" stop-opacity=".35"/><stop offset="1" stop-color="#fbe9a6" stop-opacity="0"/></linearGradient></defs>
+<rect width="400" height="300" fill="#08311f"/><rect class="orb" width="400" height="300" fill="url(#m1)"/><rect width="400" height="300" fill="url(#m2)"/><rect class="orb" width="400" height="300" fill="url(#m3)"/>
+<g fill="none" stroke="url(#ln)" stroke-width=".8"><path d="M-20 210C80 160 160 250 260 190S380 140 440 170"/><path d="M-20 230C80 180 160 270 260 210S380 160 440 190"/><path d="M-20 250C80 200 160 290 260 230S380 180 440 210"/></g></svg>
+<div class="top"><img src="icons/dash.svg" width="40" height="40" alt=""><span class="brand">Dash<small>Your personal dashboard</small></span><button class="iconbtn" id="theme" aria-label="Theme"></button></div>
+<div class="copy"><h1><span id="greet">Hello</span></h1><p id="today"></p><div id="chips" aria-live="polite"></div></div>
+</header>
+<main id="main"><h2 class="sect">Apps</h2><nav id="grid" aria-label="Apps"></nav>
+<h2 class="sect">At a glance</h2><div id="widgets"></div></main>
+<footer>Dash · Version <span data-version>dev</span> · Scores from ESPN’s public API; not affiliated with ESPN or the NBA.</footer>
 <script src="shared/update.js" defer></script><script src="apps.js" defer></script><script src="hub.js" defer></script></body></html>

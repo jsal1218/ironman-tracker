@@ -9,9 +9,9 @@ function tone(f,d=.08,type='sine',v=.12,slide=0,delay=0){if(muted)return;try{ac=
 const buzz=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const best=()=>+localStorage.getItem(`dash-games-${id}-best`)||0;
 const setBest=s=>{if(s>best()){localStorage.setItem(`dash-games-${id}-best`,s);return true}return false};
-function sndBtn(){const b=$('#sound');if(!b)return;const r=()=>{b.textContent=muted?'🔇':'🔊';b.setAttribute('aria-label',muted?'Sound off (tap to turn on)':'Sound on (tap to mute)');b.setAttribute('aria-pressed',String(!muted))};
+function sndBtn(){const b=$('#sound');if(!b)return;const r=()=>{b.innerHTML=DASH_ICON(muted?'mute':'sound');b.setAttribute('aria-label',muted?'Sound off (tap to turn on)':'Sound on (tap to mute)');b.setAttribute('aria-pressed',String(!muted))};
  r();b.onclick=()=>{muted=!muted;localStorage.setItem('dash-games-sound',muted?'off':'on');r();tone(660,.08)}}
-function overlay(title,text,btn,cb){const o=$('#ov');o.querySelector('h2').textContent=title;o.querySelector('p').textContent=text;const b=o.querySelector('button');b.textContent=btn;b.onclick=()=>{o.hidden=true;cb&&cb()};o.hidden=false;setTimeout(()=>b.focus({preventScroll:true}),30)}
+function overlay(title,text,btn,cb,icon='play'){const o=$('#ov'),pn=o.querySelector('.panel');let ic=pn.querySelector('.ov-ic');if(!ic){ic=document.createElement('div');ic.className='ov-ic';pn.prepend(ic)}ic.innerHTML=DASH_ICON(icon);o.querySelector('h2').textContent=title;o.querySelector('p').textContent=text;const b=o.querySelector('button');b.textContent=btn;b.onclick=()=>{o.hidden=true;cb&&cb()};o.hidden=false;setTimeout(()=>b.focus({preventScroll:true}),30)}
 const hide=()=>{$('#ov').hidden=true};
 function onHide(cb){document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')cb()});addEventListener('pagehide',cb)}
 // keep the page still while playing (no pinch / double-tap zoom / rubber-band scroll)

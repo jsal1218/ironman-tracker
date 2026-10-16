@@ -1,28 +1,25 @@
-// Dash app registry. To add an app: create a folder (e.g. /myapp/ with index.html that loads ../shared/update.js),
-// add it to sw.js PRE (optional, for offline), and add one entry here. `widget(el)` is optional and may return a cleanup fn.
+// Dash app registry. To add an app: create a folder (e.g. /myapp/ whose index.html loads ../shared/base.css,
+// ../shared/theme.js and ../shared/update.js), optionally add its files to PRE in sw.js for offline use,
+// and add one entry below. `widget(el)` is optional (a live card on the home screen); `parent` groups shortcuts.
 window.DASH_APPS=[
- {id:'fitness',name:'DashFit',tagline:'Triathlon training tracker',path:'fitness/',icon:'icons/icon-192.png',widget:fitWidget},
- {id:'nba',name:'DashHoops',tagline:'Pro basketball scores, live',path:'nba/',icon:'icons/nba-192.png',widget:nbaWidget},
- {id:'games',name:'Dash Games',tagline:'Orbit Merge · Paper Pilot · Bloom Blocks',path:'games/',icon:'icons/games-192.png',widget:gamesWidget},
+ {id:'nba',name:'DashHoops',tagline:'Live pro basketball scores',path:'nba/',icon:'icons/hoops.svg',widget:nbaWidget,widgetTitle:'Tonight’s games'},
+ {id:'games',name:'Dash Games',tagline:'Quick single-player games',path:'games/',icon:'icons/games.svg',widget:gamesWidget,widgetTitle:'Your best scores'},
+ {id:'orbit',name:'Orbit Merge',path:'games/orbit/',icon:'icons/orbit.svg',parent:'games'},
+ {id:'pilot',name:'Paper Pilot',path:'games/pilot/',icon:'icons/pilot.svg',parent:'games'},
+ {id:'bloom',name:'Bloom Blocks',path:'games/bloom/',icon:'icons/bloom.svg',parent:'games'},
 ];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function fitWidget(el){let E=[],S={};try{E=JSON.parse(localStorage.getItem('fitness-tracker-entries-v1'))||[];S=JSON.parse(localStorage.getItem('im-tracker-settings-v1'))||{}}catch(e){}
- if(!E.length){el.innerHTML='<p class="muted">No sessions yet — log your first swim, bike or run.</p>';return}
- const ws=S.weekStart==null?1:+S.weekStart,t=new Date();t.setHours(0,0,0,0);const st=new Date(t);st.setDate(t.getDate()-((t.getDay()-ws+7)%7));
- const iso=d=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10),a=iso(st),wk=E.filter(e=>e.date>=a);
- const by={swim:0,bike:0,run:0,other:0};wk.forEach(e=>{const k=e.type==='brick'?'run':by[e.type]!=null?e.type:'other';by[k]+=e.duration});
- const tot=Object.values(by).reduce((x,y)=>x+y,0),hm=m=>`${Math.floor(m/60)}h ${Math.round(m%60)}m`,col={swim:'#3b8fd9',bike:'#e9a800',run:'#e85d5d',other:'#a970e8'};
- el.innerHTML=`<div class="big"><b>${hm(tot)}</b><span class="muted">${wk.length} sessions this week</span></div><div class="stack" aria-hidden="true">${Object.entries(by).map(([k,v])=>v?`<i style="flex:${v};background:${col[k]}"></i>`:'').join('')}</div><div class="muted">${['swim','bike','run'].map(k=>`${k[0].toUpperCase()+k.slice(1)} ${hm(by[k])}`).join(' · ')}</div>`}
-function nbaWidget(el){let timer;const ymd=d=>`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+function gamesWidget(el){const I=DASH_ICON,L=DASH_APPS.filter(a=>a.parent==='games'),bs=L.map(a=>+localStorage.getItem('dash-games-'+a.id+'-best')||0);
+ el.innerHTML=`<ul class="glist">${L.map((a,i)=>`<li><a href="${a.path}"><img src="${a.icon}" width="40" height="40" alt=""><span class="gn"><b>${esc(a.name)}</b><small>${bs[i]?`${I('trophy','sm')} Best ${bs[i].toLocaleString()}`:'Not played yet'}</small></span><span class="gplay">${I('play','sm')}</span></a></li>`).join('')}</ul>`}
+function nbaWidget(el){let timer;const I=DASH_ICON,ymd=d=>`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
  const tm=iso=>new Date(iso).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
  async function load(){try{const r=await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/nba/scoreboard?dates=${ymd(new Date())}`,{cache:'no-store'});if(!r.ok)throw 0;const d=await r.json(),ev=d.events||[];
-  if(!ev.length){el.innerHTML='<p class="muted">No games today.</p>';return}
-  const rank={in:0,pre:1,post:2};ev.sort((x,y)=>rank[x.status.type.state]-rank[y.status.type.state]);const live=ev.some(e=>e.status.type.state==='in');
-  el.innerHTML=`<ul class="mini">${ev.slice(0,4).map(e=>{const c=e.competitions[0].competitors,h=c.find(x=>x.homeAway==='home'),a=c.find(x=>x.homeAway==='away'),s=e.status.type.state;
-   return`<li><span>${esc(a.team.abbreviation)} ${s==='pre'?'':`<b>${esc(a.score)}</b>`} @ ${esc(h.team.abbreviation)} ${s==='pre'?'':`<b>${esc(h.score)}</b>`}</span><span class="${s==='in'?'pill live':'muted'}">${s==='pre'?tm(e.date)+' ET':esc(e.status.type.shortDetail)}</span></li>`}).join('')}</ul>${ev.length>4?`<div class="muted">+${ev.length-4} more games</div>`:''}`;
-  clearTimeout(timer);if(live)timer=setTimeout(()=>document.visibilityState==='visible'?load():document.addEventListener('visibilitychange',load,{once:true}),25000)}
-  catch(e){el.innerHTML='<p class="muted">Scores unavailable right now (offline?).</p>'}}
+  if(!ev.length){el.innerHTML=`<p class="muted">${I('calendar','sm')} No games today.</p>`;window.dashStat&&dashStat('nba','No games today');return}
+  const rank={in:0,pre:1,post:2};ev.sort((x,y)=>rank[x.status.type.state]-rank[y.status.type.state]||new Date(x.date)-new Date(y.date));const nLive=ev.filter(e=>e.status.type.state==='in').length;
+  const team=(t,st)=>`<span class="tk-t"><img src="${esc(t.team.logo||'')}" width="22" height="22" alt="" loading="lazy"><b>${esc(t.team.abbreviation)}</b>${st==='pre'?'':`<span class="tk-s${t.winner?' w':''}">${esc(t.score)}</span>`}</span>`;
+  el.innerHTML=`<div class="ticker">${ev.map(e=>{const c=e.competitions[0].competitors,h=c.find(x=>x.homeAway==='home'),a=c.find(x=>x.homeAway==='away'),s=e.status.type.state;
+   return`X${team(a,s)}${team(h,s)}<span class="${s==='in'?'pill live':'pill'}">${s==='pre'?tm(e.date)+' ET':esc(e.status.type.shortDetail.replace(' - ',' · '))}</span></a>`}).join('')}</div>`;
+  window.dashStat&&dashStat('nba',nLive?`${nLive} live now`:`${ev.length} games today`,nLive>0);
+  clearTimeout(timer);if(nLive)timer=setTimeout(()=>document.visibilityState==='visible'?load():document.addEventListener('visibilitychange',load,{once:true}),25000)}
+  catch(e){el.innerHTML=`<p class="muted">Scores unavailable right now — you may be offline.</p>`}}
  load();addEventListener('online',load)}
-
-function gamesWidget(el){const G=[['orbit','🪐 Orbit Merge'],['pilot','✈️ Paper Pilot'],['bloom','🌷 Bloom Blocks']];
- el.innerHTML=`<ul class="mini">${G.map(([k,n])=>{const b=+localStorage.getItem('dash-games-'+k+'-best')||0;return`<li><a href="games/${k}/" style="color:inherit;text-decoration:none">${n}</a><span class="muted">${b?'Best '+b.toLocaleString():'Play'}</span></li>`}).join('')}</ul>`}

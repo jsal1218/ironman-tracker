@@ -1,11 +1,11 @@
-// One service worker for the whole Dash hub (scope = site root: hub, /fitness/, /nba/).
+// One service worker for the whole Dash hub (scope = site root: hub, /nba/, /games/).
 // VERSION is stamped automatically by the git pre-commit hook. Do not edit by hand.
-const VERSION='2026.10.16-160826-cbc3eac';
+const VERSION='2026.10.16-164017-834aed0';
 const C='dash-'+VERSION,IMG='dash-img';
-const PRE=['./','index.html','hub.js','apps.js','manifest.json','shared/base.css','shared/update.js','fitness/','fitness/index.html','fitness/app.js','fitness/manifest.json','nba/','nba/index.html','nba/nba.js','nba/manifest.json','icons/icon-192.png','icons/icon-512.png','icons/favicon-32.png','icons/apple-touch-icon.png','icons/nba-192.png','icons/nba-512.png','games/','games/index.html','games/manifest.json','games/games.css','games/common.js','games/orbit/','games/orbit/index.html','games/orbit/orbit.js','games/pilot/','games/pilot/index.html','games/pilot/pilot.js','games/bloom/','games/bloom/index.html','games/bloom/bloom.js','icons/games-192.png','icons/games-512.png'];
+const PRE=['./','index.html','hub.js','apps.js','manifest.json','shared/base.css','shared/update.js','shared/theme.js','shared/icons.svg','nba/','nba/index.html','nba/nba.js','nba/manifest.json','games/','games/index.html','games/manifest.json','games/games.css','games/common.js','games/orbit/','games/orbit/index.html','games/orbit/orbit.js','games/pilot/','games/pilot/index.html','games/pilot/pilot.js','games/bloom/','games/bloom/index.html','games/bloom/bloom.js','icons/dash.svg','icons/hoops.svg','icons/games.svg','icons/orbit.svg','icons/pilot.svg','icons/bloom.svg','icons/icon-192.png','icons/icon-512.png','icons/favicon-32.png','icons/apple-touch-icon.png','icons/nba-192.png','icons/nba-512.png','icons/games-192.png','icons/games-512.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>Promise.all(PRE.map(u=>c.add(new Request(u,{cache:'reload'})).catch(()=>{})))))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C&&x!==IMG).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
-const fresh=u=>u.pathname.endsWith('/')||/\.(html|js|json|css)$/.test(u.pathname);
+const fresh=u=>u.pathname.endsWith('/')||/\.(html|js|json|css|svg)$/.test(u.pathname);
 const put=(n,req,res)=>{if(res.ok||res.type==='opaque'){const cp=res.clone();caches.open(n).then(c=>c.put(req,cp))}return res};
 self.addEventListener('fetch',e=>{const r=e.request,u=new URL(r.url);if(r.method!=='GET')return;
  if(u.origin===location.origin){

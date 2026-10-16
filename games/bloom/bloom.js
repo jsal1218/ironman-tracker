@@ -2,7 +2,7 @@
 const SH=[[[0,0]],[[0,0],[0,1]],[[0,0],[1,0]],[[0,0],[0,1],[0,2]],[[0,0],[1,0],[2,0]],[[0,0],[0,1],[0,2],[0,3]],[[0,0],[1,0],[2,0],[3,0]],[[0,0],[0,1],[0,2],[0,3],[0,4]],[[0,0],[1,0],[2,0],[3,0],[4,0]],
  [[0,0],[0,1],[1,0],[1,1]],[[0,0],[0,1],[0,2],[1,0],[1,1],[1,2],[2,0],[2,1],[2,2]],[[0,0],[1,0],[1,1]],[[0,1],[1,0],[1,1]],[[0,0],[0,1],[1,0]],[[0,0],[0,1],[1,1]],
  [[0,0],[1,0],[2,0],[2,1]],[[0,1],[1,1],[2,1],[2,0]],[[0,0],[0,1],[0,2],[1,1]],[[0,0],[0,1],[1,1],[1,2]],[[0,1],[0,2],[1,0],[1,1]],[[0,0],[0,1],[0,2],[1,0]],[[0,0],[1,0],[1,1],[1,2]],[[0,0],[1,1]],[[0,1],[1,0]]];
-const COL=['#e63946','#f4a261','#f4b400','#e76f9a','#9b6bd6','#2a9d8f','#f28482'];
+const COL=['#d9b44a','#2fb582','#e9a0b4','#f1d58a','#9b6bd6','#0b8a62','#f28c6a'];
 let W,H,DPR,cell,ox,oy,trayY,trayCell,grid,tray,score,combo,over,drag=null,anim=[],raf=0,lift;
 function size(){DPR=Math.min(2,devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*DPR;cv.height=H*DPR;x.setTransform(DPR,0,0,DPR,0,0);
  cell=Math.floor(Math.min((W-24)/N,(H*.66)/N));ox=(W-cell*N)/2;oy=8;trayY=oy+cell*N+Math.max(16,(H-oy-cell*N-cell*3.2)/2);trayCell=Math.floor(Math.min(cell*.6,(W-40)/15));lift=cell*1.6;draw()}
@@ -27,19 +27,19 @@ function place(i,r,c){const p=tray[i];if(!p||!fits(p.s,r,c))return false;const{R
  score+=gain;if(tray.every(t=>!t))deal();ui();check();kick();return true}
 let fx=null;function floatTxt(s){fx={s,t0:performance.now()};kick()}
 function check(){if(tray.some(t=>t&&anyFit(t.s)))return;over=true;const nb=setBest(score);save();tone(260,.4,'sawtooth',.07,110);buzz([40,60,40]);
- setTimeout(()=>overlay(nb?'New best! 🌸':'Garden full',`No room for the remaining beds. Score ${score} · Best ${best()}`,'Replant',()=>start(true)),500)}
+ setTimeout(()=>overlay(nb?'New best!':'Garden full',`No room for the remaining beds. Score ${score} · Best ${best()}`,'Replant',()=>start(true),nb?'trophy':'restart'),500)}
 function hover(){if(!drag)return null;const p=tray[drag.i],r=Math.round((drag.y-drag.gy-oy)/cell),c=Math.round((drag.x-drag.gx-ox)/cell);return fits(p.s,r,c)?{r,c}:null}
 function cellRect(X,Y,s,col,a=1){x.globalAlpha=a;x.fillStyle=col;const m=Math.max(1,s*.06);x.beginPath();x.roundRect?x.roundRect(X+m,Y+m,s-2*m,s-2*m,s*.22):x.rect(X+m,Y+m,s-2*m,s-2*m);x.fill();
  x.fillStyle='rgba(255,255,255,.55)';x.beginPath();x.arc(X+s/2,Y+s/2,s*.14,0,7);x.fill();x.fillStyle='rgba(255,255,255,.25)';for(let k=0;k<4;k++){x.beginPath();x.arc(X+s/2+Math.cos(k*1.57)*s*.2,Y+s/2+Math.sin(k*1.57)*s*.2,s*.1,0,7);x.fill()}x.globalAlpha=1}
-function draw(){const now=performance.now();x.clearRect(0,0,W,H);x.fillStyle='#6b8f3a';x.beginPath();x.roundRect?x.roundRect(ox-6,oy-6,cell*N+12,cell*N+12,16):x.rect(ox-6,oy-6,cell*N+12,cell*N+12);x.fill();
+function draw(){const now=performance.now();x.clearRect(0,0,W,H);x.fillStyle='#0b6e4f';x.beginPath();x.roundRect?x.roundRect(ox-6,oy-6,cell*N+12,cell*N+12,16):x.rect(ox-6,oy-6,cell*N+12,cell*N+12);x.fill();
  for(let r=0;r<N;r++)for(let c=0;c<N;c++){x.fillStyle=(r+c)%2?'#8a6a45':'#94744e';x.fillRect(ox+c*cell,oy+r*cell,cell,cell);if(grid[r][c])cellRect(ox+c*cell,oy+r*cell,cell,grid[r][c])}
- const h=hover();if(drag&&h){const p=tray[drag.i],{R,C}=lines(p.s,h.r,h.c);x.fillStyle='rgba(244,180,0,.35)';R.forEach(r=>x.fillRect(ox,oy+r*cell,cell*N,cell));C.forEach(c=>x.fillRect(ox+c*cell,oy,cell,cell*N));
+ const h=hover();if(drag&&h){const p=tray[drag.i],{R,C}=lines(p.s,h.r,h.c);x.fillStyle='rgba(217,180,74,.42)';R.forEach(r=>x.fillRect(ox,oy+r*cell,cell*N,cell));C.forEach(c=>x.fillRect(ox+c*cell,oy,cell,cell*N));
   p.s.forEach(([a,b])=>cellRect(ox+(h.c+b)*cell,oy+(h.r+a)*cell,cell,p.c,.45))}
  anim=anim.filter(a=>{const k=(now-a.t0)/260;if(k>=1)return false;if(k<0){cellRect(ox+a.c*cell,oy+a.r*cell,cell,a.col);return true}const s=cell*(1-k);x.globalAlpha=1-k;cellRect(ox+a.c*cell+(cell-s)/2,oy+a.r*cell+(cell-s)/2-k*cell*.4,s,a.col,1-k);x.globalAlpha=1;return true});
- x.fillStyle='rgba(107,143,58,.12)';x.beginPath();x.roundRect?x.roundRect(8,trayY-cell*.6,W-16,cell*3.2,18):x.rect(8,trayY-cell*.6,W-16,cell*3.2);x.fill();
+ x.fillStyle='rgba(11,110,79,.1)';x.beginPath();x.roundRect?x.roundRect(8,trayY-cell*.6,W-16,cell*3.2,18):x.rect(8,trayY-cell*.6,W-16,cell*3.2);x.fill();
  tray.forEach((p,i)=>{if(!p||(drag&&drag.i===i))return;const[X,Y]=trayPos(i),ok=anyFit(p.s);p.s.forEach(([a,b])=>cellRect(X+b*trayCell,Y+a*trayCell,trayCell,ok?p.c:'#b9ad9c'))});
  if(drag){const p=tray[drag.i];p.s.forEach(([a,b])=>cellRect(drag.x-drag.gx+b*cell,drag.y-drag.gy+a*cell,cell,p.c,.95))}
- if(fx){const k=(now-fx.t0)/900;if(k<1){x.globalAlpha=1-k;x.fillStyle='#8a5a00';x.font=`800 ${cell*.6}px system-ui,sans-serif`;x.textAlign='center';x.fillText(fx.s,W/2,oy+cell*N/2-k*cell);x.globalAlpha=1}else fx=null}
+ if(fx){const k=(now-fx.t0)/900;if(k<1){x.globalAlpha=1-k;x.fillStyle='#7a5a00';x.font=`800 ${cell*.6}px system-ui,sans-serif`;x.textAlign='center';x.fillText(fx.s,W/2,oy+cell*N/2-k*cell);x.globalAlpha=1}else fx=null}
  if(anim.length||fx||drag)raf=requestAnimationFrame(draw)}
 const kick=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(draw)};
 function pick(px,py){for(let i=0;i<3;i++){const p=tray[i];if(!p)continue;const[X,Y]=trayPos(i),[h,w]=dims(p.s),pad=trayCell*.8;if(px>=X-pad&&px<=X+w*trayCell+pad&&py>=Y-pad&&py<=Y+h*trayCell+pad)return{i,X,Y}}return null}

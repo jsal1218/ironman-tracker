@@ -1,5 +1,5 @@
 (()=>{'use strict';const {tone,buzz,best,setBest,overlay,$}=G,N=4,ANIM=G.reduced?0:110;
-const T={2:['Stardust','#8d84a8','#5b5373'],4:['Pebble','#a08f7d','#6c5c4c'],8:['Asteroid','#9a8a8a','#5a4848'],16:['Moon','#e8e1d0','#9f957f'],32:['Mars','#e2603f','#8f2a17'],64:['Ocean','#3fa8e2','#175c8f'],128:['Ringed','#e9c46a','#a1782a',1],256:['Gas giant','#f4a259','#b0531e'],512:['Star','#ffd166','#f08c00'],1024:['Red giant','#ff6b4a','#c1121f'],2048:['Galaxy','#c084fc','#5b21b6'],4096:['Nebula','#f472b6','#9d174d'],8192:['Black hole','#3b2d5c','#000']};
+const T={2:['Stardust','#8d84a8','#5b5373'],4:['Pebble','#a08f7d','#6c5c4c'],8:['Asteroid','#9a8a8a','#5a4848'],16:['Moon','#e8e1d0','#9f957f'],32:['Mars','#e2603f','#8f2a17'],64:['Ocean','#3fa8e2','#175c8f'],128:['Ringed','#e9c46a','#a1782a',1],256:['Gas giant','#f4a259','#b0531e'],512:['Star','#fbe9a6','#c99a1e'],1024:['Red giant','#ff6b4a','#c1121f'],2048:['Galaxy','#c084fc','#5b21b6'],4096:['Nebula','#f472b6','#9d174d'],8192:['Black hole','#3b2d5c','#000']};
 const look=v=>T[v]||T[8192];
 const board=$('#board');let grid,score,hist,undos,over,won,idc=0,lock=false;
 for(let i=0;i<16;i++){const c=document.createElement('div');c.className='cell';c.style.transform=pos(i/4|0,i%4);board.appendChild(c)}
@@ -24,8 +24,8 @@ function move(d){if(lock||over||!$('#ov').hidden)return;const V=[[-1,0],[0,1],[1
  if(!moved){buzz(8);return}
  lock=true;hist.push(s);if(hist.length>30)hist.shift();score+=gain;
  if(gain){tone(220+Math.log2(top)*60,.12,'triangle',.12);buzz(top>=128?[12,30,12]:10)}else tone(160,.04,'sine',.05);
- setTimeout(()=>{lock=false;add();if(!won&&top>=2048){won=true;tone(523,.15);tone(784,.25,'sine',.12,0,.12);overlay('Galaxy formed! 🌌','You merged a galaxy. Keep going for a black hole?','Keep playing')}
-  if(!canMove()){over=true;const nb=setBest(score);tone(300,.3,'sawtooth',.08,120);buzz([30,60,30]);overlay(nb?'New best! ✨':'No more moves',`Score ${score}${nb?'':' · Best '+best()}`,'Play again',()=>start(true))}ui()},ANIM+5);ui()}
+ setTimeout(()=>{lock=false;add();if(!won&&top>=2048){won=true;tone(523,.15);tone(784,.25,'sine',.12,0,.12);overlay('Galaxy formed!','You merged a galaxy. Keep going for a black hole?','Keep playing',null,'spark')}
+  if(!canMove()){over=true;const nb=setBest(score);tone(300,.3,'sawtooth',.08,120);buzz([30,60,30]);overlay(nb?'New best!':'No more moves',`Score ${score}${nb?'':' · Best '+best()}`,'Play again',()=>start(true),nb?'trophy':'restart')}ui()},ANIM+5);ui()}
 $('#undo').onclick=()=>{if(!undos||!hist.length||over)return;undos--;load(hist.pop());tone(330,.08,'sine',.08,220);ui()};
 $('#newBtn').onclick=()=>{if(score>0&&!over&&!confirm('Start a new game?'))return;setBest(score);start(true)};
 addEventListener('keydown',e=>{const k={ArrowUp:0,KeyW:0,ArrowRight:1,KeyD:1,ArrowDown:2,KeyS:2,ArrowLeft:3,KeyA:3}[e.code];if(k!=null){e.preventDefault();move(k)}else if(e.code==='KeyU')$('#undo').click()});

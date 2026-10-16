@@ -1,2 +1,0 @@
-{"name":"DashFit — Triathlon training tracker","short_name":"DashFit","description":"Free, offline-first triathlon training log for sprint, olympic, half and full-distance plans.","start_url":"./","scope":"./","display":"standalone","orientation":"any","background_color":"#f7f4ee","theme_color":"#f7f4ee","id":"./",
-"icons":[{"src":"../icons/icon-192.png","sizes":"192x192","type":"image/png"},{"src":"../icons/icon-512.png","sizes":"512x512","type":"image/png"},{"src":"../icons/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]}
