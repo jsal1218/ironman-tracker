@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Dash Notes — fast, private, offline notes</title>
+<meta name="description" content="Dash Notes: markdown notes with checklists, notebooks, tags, wikilinks and backlinks, version history, reminders, attachments, and optional encryption. Works offline.">
+<meta name="theme-color" content="#f6f4ee"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Dash Notes">
+<link rel="manifest" href="manifest.json"><link rel="icon" type="image/svg+xml" href="../icons/notes.svg"><link rel="apple-touch-icon" href="../icons/notes-192.png">
+<script src="../shared/theme.js"></script><link rel="stylesheet" href="../shared/base.css"><link rel="stylesheet" href="notes.css">
+</head><body>
+<a class="skip" href="#list">Skip to notes</a>
+<div class="app">
+<nav id="drawer" class="drawer" aria-label="Notebooks and views">
+ <div class="dhead"><a class="home" href="../" aria-label="Back to Dash home"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#back"/></svg>Dash</a></div>
+ <div class="brand"><img src="../icons/notes.svg" width="32" height="32" alt=""><span>Dash Notes</span></div>
+ <div id="views"></div>
+ <div class="dsec"><span>Notebooks</span><button class="iconbtn sm" id="addNb" aria-label="New notebook"><svg class="i sm" aria-hidden="true"><use href="../shared/icons.svg#plus"/></svg></button></div><div id="nbs"></div>
+ <div class="dsec"><span>Tags</span></div><div id="tags"></div>
+ <div class="dfoot"><button id="dataBtn"><svg class="i sm" aria-hidden="true"><use href="../shared/icons.svg#download"/></svg>Backup &amp; settings</button><button id="keysBtn" class="desk"><svg class="i sm" aria-hidden="true"><use href="../shared/icons.svg#keyboard"/></svg>Shortcuts</button></div>
+</nav>
+<div class="scrim" id="scrim"></div>
+<main class="mainwrap"><section class="listpane" aria-label="Notes list">
+ <header class="lbar"><button class="iconbtn mob" id="menuBtn" aria-label="Open notebooks and views"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#menu"/></svg></button><h1 id="viewTitle">All notes</h1><button class="iconbtn" id="newBtn" aria-label="New note (Ctrl+Alt+N)"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#plus"/></svg></button></header>
+ <div class="searchrow"><label class="search"><svg class="i sm" aria-hidden="true"><use href="../shared/icons.svg#search"/></svg><span class="sr">Search notes</span><input id="q" type="search" placeholder="Search notes" autocomplete="off"></label><button class="iconbtn" id="filterBtn" aria-label="Filters and sort" aria-expanded="false"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#filter"/></svg></button></div>
+ <div class="filters" id="filters" hidden>
+  <label>Notebook<select id="fNb"></select></label><label>Tag<select id="fTag"></select></label>
+  <label>Edited<select id="fDate"><option value="">Any time</option><option value="1">Today</option><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></label>
+  <label>Sort<select id="fSort"><option value="updated">Last edited</option><option value="created">Created</option><option value="title">Title</option></select></label>
+  <label class="chk"><input type="checkbox" id="fCheck"> Has checklist</label>
+ </div>
+ <ul id="list" class="list" aria-live="polite"></ul>
+ <p class="hint mob-only">Swipe right to pin, left to archive, far left to delete.</p>
+</section>
+<section class="editpane" id="editor" aria-label="Note editor">
+ <header class="ebar">
+  <button class="iconbtn" id="backBtn" aria-label="Back to list"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#back"/></svg></button>
+  <span id="saveState" class="muted" role="status"></span>
+  <span class="grow"></span>
+  <button class="iconbtn" id="modeBtn" aria-label="Preview"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#eye"/></svg></button>
+  <button class="iconbtn" id="pinBtn" aria-label="Pin" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#pin"/></svg></button>
+  <button class="iconbtn" id="propsBtn" aria-label="Notebook, tags, color, reminder"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#tag"/></svg></button>
+  <button class="iconbtn" id="moreBtn" aria-label="More actions"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#more"/></svg></button>
+ </header>
+ <div class="meta" id="metaRow"></div>
+ <input id="title" class="title" placeholder="Title" aria-label="Note title" autocomplete="off">
+ <div class="toolbar" id="toolbar" role="toolbar" aria-label="Formatting"></div>
+ <div class="body">
+  <textarea id="body" aria-label="Note text (Markdown)" placeholder="Start writing… type / for commands"></textarea>
+  <article id="preview" class="md" hidden></article>
+  <div id="slash" class="slash" role="listbox" aria-label="Insert" hidden></div>
+ </div>
+ <footer class="efoot"><span id="counts"></span><span id="dates"></span></footer>
+ <div id="backlinks" class="backlinks"></div>
+ <div id="lockGate" class="lockgate" hidden><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#lock"/></svg><h2>This note is locked</h2><form id="unlockForm"><label class="sr" for="unlockPw">Password</label><input type="password" id="unlockPw" placeholder="Password" autocomplete="current-password"><button class="primary">Unlock</button></form><p class="muted" id="unlockErr" role="alert"></p></div>
+ <div class="empty-ed" id="emptyEd"><img src="../icons/notes.svg" width="72" height="72" alt=""><p>Select a note or create a new one.</p></div>
+</section></main>
+</div>
+<dialog id="sheet" aria-labelledby="sheetTitle"><div class="shead"><h2 id="sheetTitle"></h2><button class="iconbtn" id="sheetClose" aria-label="Close"><svg class="i" aria-hidden="true"><use href="../shared/icons.svg#close"/></svg></button></div><div class="sbody" id="sheetBody"></div></dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+<input type="file" id="fileIn" hidden multiple><input type="file" id="importIn" accept="application/json,.json" hidden>
+<div id="printArea" class="md print-only"></div>
+<script src="../shared/update.js" defer></script><script src="db.js" defer></script><script src="md.js" defer></script><script src="zip.js" defer></script><script src="notes.js" defer></script>
+</body></html>

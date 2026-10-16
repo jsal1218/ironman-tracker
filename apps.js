@@ -3,6 +3,7 @@
 // and add one entry below. `widget(el)` is optional (a live card on the home screen); `parent` groups shortcuts.
 window.DASH_APPS=[
  {id:'nba',name:'DashHoops',tagline:'Live pro basketball scores',path:'nba/',icon:'icons/hoops.svg',widget:nbaWidget,widgetTitle:'Tonight’s games'},
+ {id:'notes',name:'Dash Notes',tagline:'Fast, private, offline notes',path:'notes/',icon:'icons/notes.svg',widget:notesWidget,widgetTitle:'Notes'},
  {id:'games',name:'Dash Games',tagline:'Quick single-player games',path:'games/',icon:'icons/games.svg',widget:gamesWidget,widgetTitle:'Your best scores'},
  {id:'orbit',name:'Orbit Merge',path:'games/orbit/',icon:'icons/orbit.svg',parent:'games'},
  {id:'pilot',name:'Paper Pilot',path:'games/pilot/',icon:'icons/pilot.svg',parent:'games'},
@@ -23,3 +24,11 @@ function nbaWidget(el){let timer;const I=DASH_ICON,ymd=d=>`${d.getFullYear()}${S
   clearTimeout(timer);if(nLive)timer=setTimeout(()=>document.visibilityState==='visible'?load():document.addEventListener('visibilitychange',load,{once:true}),25000)}
   catch(e){el.innerHTML=`<p class="muted">Scores unavailable right now — you may be offline.</p>`}}
  load();addEventListener('online',load)}
+
+function notesWidget(el){const I=DASH_ICON;if(!window.NotesDB){el.innerHTML='<p class="muted">Open Dash Notes to get started.</p>';return}
+ async function draw(){let L=[];try{L=(await NotesDB.all('notes')).filter(n=>!n.trashed&&!n.archived).sort((a,b)=>(b.pinned-a.pinned)||b.updated-a.updated)}catch(e){}
+  const plain=s=>String(s||'').replace(/!?\[[^\]]*\]\([^)]*\)/g,' ').replace(/^\s*([-*+]|\d+[.)])\s+(\[[ xX]\]\s+)?/gm,'').replace(/^\s*\|?[\s:|-]*-{3,}[\s:|-]*$/gm,' ').replace(/[#>*_~=`|\[\]()!-]/g,' ').replace(/\s+/g,' ').trim().slice(0,80);
+  el.querySelector('.nlist').innerHTML=L.length?L.slice(0,4).map(n=>`<li><a href="notes/#n=${encodeURIComponent(n.id)}"><span class="nic">${I(n.locked?'lock':n.pinned?'pin':'note','sm')}</span><span class="nt"><b>${esc(n.title||'Untitled')}</b><small>${n.locked?'Locked note':esc(plain(n.body))||'No additional text'}</small></span></a></li>`).join(''):'<li class="muted" style="padding:8px 0">No notes yet — jot one down above.</li>'}
+ el.innerHTML=`<form class="qadd"><label class="sr" for="qn">Quick note</label><input id="qn" placeholder="Quick note…" autocomplete="off" enterkeyhint="done"><button class="primary iconbtn" aria-label="Add note">${I('plus')}</button></form><ul class="nlist"></ul>`;
+ el.querySelector('form').onsubmit=async e=>{e.preventDefault();const v=el.querySelector('#qn').value.trim();if(!v)return;const[t,...rest]=v.split(/\n/);await NotesDB.put('notes',NotesDB.blank({title:t.slice(0,120),body:rest.join('\n')}));el.querySelector('#qn').value='';draw()};
+ draw();document.addEventListener('visibilitychange',()=>document.visibilityState==='visible'&&draw())}

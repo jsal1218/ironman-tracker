@@ -5,6 +5,7 @@ Static, no-build PWA hub (HTML/CSS/JS):
 - `/` — Dash hub (tiles + live widgets), app registry in `apps.js`
 - `/fitness/` — retired (DashFit was removed; this path just redirects to the hub, and the hub clears old DashFit data once)
 - `/nba/` — DashHoops scores (ESPN public scoreboard/summary API, CORS-enabled, no key)
+- `/notes/` — Dash Notes: markdown notes in IndexedDB (`db.js` shared with the hub widget, `md.js` renderer, `zip.js` export, `notes.js` app)
 - `/games/` — Dash Games: Orbit Merge (`orbit/`), Paper Pilot (`pilot/`), Bloom Blocks (`bloom/`); shared `games.css` + `common.js` (sound, haptics, best scores, overlay)
 - `shared/` — design tokens (`base.css`, green/gold, light+dark), `theme.js` (applies saved theme before paint), `icons.svg` (UI icon sprite; use `DASH_ICON(name)` in JS), `update.js` (version + auto-update)
 - `sw.js` — one service worker for the whole site (scope `/`), network-first for HTML/JS/JSON/CSS
