@@ -60,4 +60,5 @@ async function detail(id,quiet){openId=id;clearTimeout(dTimer);const dlg=$('#det
   $('#dBody').innerHTML=html;if(st==='in')dTimer=setTimeout(()=>{if(document.visibilityState==='visible')detail(id,true)},25000)}
  catch(e){if(!quiet)$('#dBody').innerHTML='<div class="empty" role="alert">Couldn’t load game details. Check your connection and try again.</div>';else dTimer=setTimeout(()=>detail(id,true),25000)}}
 load(true);
+{const gq=new URLSearchParams(location.search).get('game');if(gq&&/^\d+$/.test(gq))detail(gq)}
 })();
