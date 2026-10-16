@@ -1,8 +1,8 @@
 // One service worker for the whole Dash hub (scope = site root: hub, /fitness/, /nba/).
 // VERSION is stamped automatically by the git pre-commit hook. Do not edit by hand.
-const VERSION='2026.10.15-000402-c204461';
+const VERSION='2026.10.16-160826-cbc3eac';
 const C='dash-'+VERSION,IMG='dash-img';
-const PRE=['./','index.html','hub.js','apps.js','manifest.json','shared/base.css','shared/update.js','fitness/','fitness/index.html','fitness/app.js','fitness/manifest.json','nba/','nba/index.html','nba/nba.js','nba/manifest.json','icons/icon-192.png','icons/icon-512.png','icons/favicon-32.png','icons/apple-touch-icon.png','icons/nba-192.png','icons/nba-512.png'];
+const PRE=['./','index.html','hub.js','apps.js','manifest.json','shared/base.css','shared/update.js','fitness/','fitness/index.html','fitness/app.js','fitness/manifest.json','nba/','nba/index.html','nba/nba.js','nba/manifest.json','icons/icon-192.png','icons/icon-512.png','icons/favicon-32.png','icons/apple-touch-icon.png','icons/nba-192.png','icons/nba-512.png','games/','games/index.html','games/manifest.json','games/games.css','games/common.js','games/orbit/','games/orbit/index.html','games/orbit/orbit.js','games/pilot/','games/pilot/index.html','games/pilot/pilot.js','games/bloom/','games/bloom/index.html','games/bloom/bloom.js','icons/games-192.png','icons/games-512.png'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>Promise.all(PRE.map(u=>c.add(new Request(u,{cache:'reload'})).catch(()=>{})))))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C&&x!==IMG).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));
 const fresh=u=>u.pathname.endsWith('/')||/\.(html|js|json|css)$/.test(u.pathname);

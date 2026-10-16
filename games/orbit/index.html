@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Orbit Merge — merge planets into a galaxy</title><meta name="description" content="Orbit Merge: swipe to merge stardust into moons, planets, stars and galaxies. With undo, smooth animations, and offline play.">
+<meta name="theme-color" content="#1b1230"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="icon" href="../../icons/games-192.png"><link rel="apple-touch-icon" href="../../icons/games-192.png">
+<link rel="stylesheet" href="../games.css">
+<style>
+body{background:#140d24;color:#f6efe6}
+:root{--card:#22183a;--line:#3b2d5c;--text:#f6efe6;--muted:#c9bedf;--focus:#ffc93c}
+.gbar a{color:#ffc93c}
+.stage{width:min(94vw,440px);aspect-ratio:1;border-radius:20px;background:radial-gradient(circle at 30% 20%,#2c2050,#1b1230 70%);border:1px solid #3b2d5c;padding:10px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.cell,.tile{position:absolute;width:calc((100% - 50px)/4);height:calc((100% - 50px)/4);left:10px;top:10px;border-radius:14px}
+.cell{background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.08)}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;will-change:transform;z-index:2}
+.orb{width:72%;height:72%;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:clamp(14px,4.6vw,22px);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);position:relative}
+.tile small{font-size:clamp(8px,2.3vw,11px);color:#d9cdf0;margin-top:2px;letter-spacing:.03em;white-space:nowrap}
+.ring::after{content:'';position:absolute;inset:38% -18%;border:3px solid rgba(255,214,120,.8);border-radius:50%;transform:rotate(-18deg)}
+@media (prefers-reduced-motion:no-preference){.tile{transition:transform 110ms ease-out}.tile.new .orb{animation:pop .18s ease-out}.tile.pop .orb{animation:pop .2s ease-out}@keyframes pop{0%{transform:scale(.4)}60%{transform:scale(1.15)}100%{transform:scale(1)}}}
+.tile.dying{z-index:1}
+.tools{display:flex;justify-content:center;gap:10px;padding:12px}
+.tools .gbtn{padding:0 16px;font-size:.95rem}
+.toast{position:fixed;left:50%;top:30%;transform:translateX(-50%);background:#ffc93c;color:#1d1012;font-weight:800;padding:8px 16px;border-radius:99px;z-index:20;pointer-events:none}
+</style></head>
+<body data-game="orbit">
+<header class="gbar"><a href="../" aria-label="Back to Games">← Games</a><h1>🪐 Orbit Merge</h1><button class="gbtn" id="sound"></button></header>
+<div class="scores"><div class="sc"><span>Score</span><b id="score">0</b></div><div class="sc"><span>Best</span><b id="best">0</b></div></div>
+<main><div class="stage" id="board" aria-label="Game board. Swipe or use arrow keys to merge." role="application"><div class="overlay" id="ov" hidden><div class="panel"><h2></h2><p></p><button class="play"></button></div></div></div>
+<div class="tools"><button class="gbtn" id="undo">↶ Undo <span id="undoN">3</span></button><button class="gbtn" id="newBtn">New game</button></div>
+<p class="hint">Swipe or use arrow keys / WASD. Merge matching bodies: stardust → pebble → … → galaxy.</p></main>
+<script src="../../shared/update.js" defer></script><script src="../common.js" defer></script><script src="orbit.js" defer></script></body></html>

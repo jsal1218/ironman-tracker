@@ -3,6 +3,7 @@
 window.DASH_APPS=[
  {id:'fitness',name:'DashFit',tagline:'Triathlon training tracker',path:'fitness/',icon:'icons/icon-192.png',widget:fitWidget},
  {id:'nba',name:'DashHoops',tagline:'Pro basketball scores, live',path:'nba/',icon:'icons/nba-192.png',widget:nbaWidget},
+ {id:'games',name:'Dash Games',tagline:'Orbit Merge · Paper Pilot · Bloom Blocks',path:'games/',icon:'icons/games-192.png',widget:gamesWidget},
 ];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function fitWidget(el){let E=[],S={};try{E=JSON.parse(localStorage.getItem('fitness-tracker-entries-v1'))||[];S=JSON.parse(localStorage.getItem('im-tracker-settings-v1'))||{}}catch(e){}
@@ -22,3 +23,6 @@ function nbaWidget(el){let timer;const ymd=d=>`${d.getFullYear()}${String(d.getM
   clearTimeout(timer);if(live)timer=setTimeout(()=>document.visibilityState==='visible'?load():document.addEventListener('visibilitychange',load,{once:true}),25000)}
   catch(e){el.innerHTML='<p class="muted">Scores unavailable right now (offline?).</p>'}}
  load();addEventListener('online',load)}
+
+function gamesWidget(el){const G=[['orbit','🪐 Orbit Merge'],['pilot','✈️ Paper Pilot'],['bloom','🌷 Bloom Blocks']];
+ el.innerHTML=`<ul class="mini">${G.map(([k,n])=>{const b=+localStorage.getItem('dash-games-'+k+'-best')||0;return`<li><a href="games/${k}/" style="color:inherit;text-decoration:none">${n}</a><span class="muted">${b?'Best '+b.toLocaleString():'Play'}</span></li>`}).join('')}</ul>`}
