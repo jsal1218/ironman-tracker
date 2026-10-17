@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Promenade: 3D walking simulation</title><meta name="description" content="Promenade: a 3D human simulation. Watch a realistic rigged character walk a loop around a lamppost in a golden-hour plaza, roam with a joystick, or idle. Works offline.">
+<meta name="theme-color" content="#0f2a20"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" type="image/svg+xml" href="../icons/sim.svg"><link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+
+
+<link rel="stylesheet" href="sim.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js","three/addons/":"./vendor/addons/"}}</script>
+</head><body>
+<canvas id="cv" aria-label="3D scene: a woman walking around a lamppost in a plaza"></canvas>
+<header class="top">
+ <a class="btn back" href="../" aria-label="Back to Dash home"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg><span>Dash</span></a>
+ <h1><img src="../icons/sim.svg" width="30" height="30" alt=""><span>Promenade<small id="status">Loading</small></span></h1>
+ <button class="btn ic" id="bInfo" aria-label="About and credits"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg></button>
+</header>
+<div id="joy" class="joy" hidden aria-hidden="true"><div class="knob"></div></div>
+<p id="hint" class="hint" hidden></p>
+<section class="panel" aria-label="Simulation controls">
+ <div class="row">
+  <button class="btn ic big" id="bPlay" aria-label="Pause"><svg aria-hidden="true" viewBox="0 0 24 24"><g class="ipause"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></g><path class="iplay" d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.6-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z"/></svg></button>
+  <div class="seg" role="radiogroup" aria-label="Behaviour">
+   <button role="radio" data-mode="loop" aria-checked="true"><svg aria-hidden="true" viewBox="0 0 24 24"><ellipse cx="12" cy="15" rx="8.5" ry="4.5"/><path d="M12 3v12"/></svg><span>Around post</span></button>
+   <button role="radio" data-mode="roam" aria-checked="false"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3"/></svg><span>Free roam</span></button>
+   <button role="radio" data-mode="idle" aria-checked="false"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><path d="M12 8v7M9 21l3-6 3 6M8 11h8"/></svg><span>Idle</span></button>
+  </div>
+  <button class="btn ic big" id="bCam" aria-label="Camera: auto orbit. Tap for follow camera" aria-pressed="false"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 8.5A2 2 0 0 1 5 6.5h2l1.5-2h7l1.5 2h2a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.4"/></svg><span id="camL">Orbit</span></button>
+ </div>
+ <label class="row speed"><span>Walk speed</span><input id="spd" type="range" min="0.5" max="1.5" step="0.05" value="1.15" aria-describedby="spdV"><output id="spdV">1.15 m/s</output></label>
+</section>
+<div id="load" class="load" role="status" aria-live="polite">
+ <div class="lcard"><img src="../icons/sim.svg" width="64" height="64" alt=""><b>Promenade</b><span id="lmsg">Loading the plaza and character</span>
+ <div class="bar" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="lbar"></i></div><small id="lpct">0%</small></div>
+</div>
+<dialog id="info" aria-labelledby="iT"><form method="dialog">
+ <h2 id="iT">About Promenade</h2>
+ <p>A small 3D human simulation: a rigged character walks a loop around the lamppost, roams where you steer her, or idles. Drag to orbit, pinch or scroll to zoom. In Free roam, use the joystick or WASD.</p>
+ <h3>Credits and licenses</h3>
+ <ul>
+  <li><b>Character body and long hair:</b> "Universal Base Characters" (Superhero Female base, Hair Long) by Quaternius, <a href="https://quaternius.com/packs/universalbasecharacters.html" rel="noopener">quaternius.com</a>. License: CC0 1.0 (public domain).</li>
+  <li><b>Walk and idle animations:</b> "Universal Animation Library" by Quaternius. License: CC0 1.0.</li>
+  <li><b>3D engine:</b> three.js r180, MIT License (vendored locally).</li>
+  <li>Skin, hair and clothing colors, the tank top, shorts, necklace, bracelets and the whole plaza are customised or built procedurally for this app. No photo is used as a texture.</li>
+ </ul>
+ <button class="btn ok" value="close">Close</button>
+</form></dialog>
+<noscript><p class="nojs">Promenade needs JavaScript and WebGL.</p></noscript>
+<script src="../shared/update.js" defer></script>
+<script type="module" src="sim.js"></script>
+</body></html>
