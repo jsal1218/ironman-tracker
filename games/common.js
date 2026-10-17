@@ -17,6 +17,11 @@ function onHide(cb){document.addEventListener('visibilitychange',()=>{if(documen
 // keep the page still while playing (no pinch / double-tap zoom / rubber-band scroll)
 document.addEventListener('gesturestart',e=>e.preventDefault());
 document.addEventListener('touchmove',e=>{if(e.target.closest('.stage'))e.preventDefault()},{passive:false});
+// recently played list for the Games landing page and the hub card
+if(id){try{const r=JSON.parse(localStorage.getItem('dash-games-recent')||'[]').filter(v=>v!==id);r.unshift(id);localStorage.setItem('dash-games-recent',JSON.stringify(r.slice(0,12)))}catch(e){}}
+// size a full-screen canvas for the device pixel ratio; returns usable insets below the HUD and above the home indicator
+function fit(cv,x){const DPR=Math.min(2,devicePixelRatio||1),W=cv.clientWidth,H=cv.clientHeight;cv.width=Math.round(W*DPR);cv.height=Math.round(H*DPR);x.setTransform(DPR,0,0,DPR,0,0);
+ const gb=document.querySelector('.gbar'),cr=cv.getBoundingClientRect(),top=gb?Math.max(0,gb.getBoundingClientRect().bottom-cr.top):0,bot=parseFloat(getComputedStyle(document.body).getPropertyValue('--sab'))||0;return{W,H,DPR,top,bot}}
 document.addEventListener('DOMContentLoaded',sndBtn);if(document.readyState!=='loading')sndBtn();
-return{id,reduced,tone,buzz,best,setBest,overlay,hide,onHide,$,get muted(){return muted}};
+return{id,reduced,tone,buzz,best,setBest,overlay,hide,onHide,fit,$,get muted(){return muted}};
 })();

@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Prism Paddle — crystal brick breaker</title><meta name="description" content="Prism Paddle: bounce a light orb into rows of crystal prisms. Catch power-ups for a wide paddle, triple orbs and slow time, and chain hits for big combos.">
+<meta name="theme-color" content="#0a1a20"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="icon" type="image/svg+xml" href="../../icons/prism.svg"><link rel="apple-touch-icon" href="../../icons/games-192.png">
+<script src="../../shared/theme.js"></script><link rel="stylesheet" href="../games.css"><style>body.fs{--gbg:#0a1a20}</style></head>
+<body class="fs" data-game="prism">
+<header class="gbar"><a href="../" aria-label="Back to Games"><svg class="i" aria-hidden="true"><use href="../../shared/icons.svg#back"/></svg>Games</a><h1 class="vh">Prism Paddle</h1>
+<div class="hud"><div class="pillh"><span>Score</span><b id="sc">0</b></div><div class="pillh"><span>Level</span><b id="lv">0</b></div><div class="pillh"><span>Orbs</span><b id="lf">0</b></div></div><span style="margin-left:auto"></span><button class="gbtn" id="pause" aria-label="Pause"><svg class="i" aria-hidden="true"><use href="../../shared/icons.svg#pause"/></svg></button><button class="gbtn" id="sound"></button></header>
+<main><div class="stage" id="stage" role="application" aria-label="Prism Paddle. Drag anywhere to move the paddle, tap to launch."><canvas id="cv"></canvas>
+<div class="overlay" id="ov" hidden><div class="panel"><h2></h2><p></p><button class="play"></button></div></div></div></main>
+<script src="../../shared/update.js" defer></script><script src="../common.js" defer></script><script src="prism.js" defer></script></body></html>
